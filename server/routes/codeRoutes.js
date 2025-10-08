@@ -79,10 +79,20 @@ router.post('/execute', async (req, res) => {
 
   } catch (error) {
     console.error('Code execution error:', error);
+    
+    // Handle timeout errors specifically
+    if (error.response?.status === 504 || error.code === 'ETIMEDOUT') {
+      return res.status(504).json({
+        success: false,
+        error: 'Code execution timed out',
+        message: 'The code execution service is taking too long to respond. Please try again or use a simpler code example.'
+      });
+    }
+    
     res.status(500).json({
       success: false,
       error: 'Code execution failed',
-      message: error.message
+      message: error.response?.data?.messages || error.message
     });
   }
 });
