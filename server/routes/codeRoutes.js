@@ -3,17 +3,17 @@ import axios from 'axios';
 
 const router = express.Router();
 
-// Language IDs for Judge0
-const LANGUAGE_IDS = {
-  python: 71,
-  javascript: 63,
-  java: 62,
-  cpp: 54,
-  c: 50
+// Language mappings for Piston API
+const PISTON_LANGUAGES = {
+  python: 'python',
+  javascript: 'javascript',
+  java: 'java',
+  cpp: 'c++',
+  c: 'c'
 };
 
 // @route   POST /api/code/execute
-// @desc    Execute code using Judge0 API
+// @desc    Execute code using Piston API (Free, No API Key Required)
 // @access  Public
 router.post('/execute', async (req, res) => {
   try {
@@ -26,53 +26,54 @@ router.post('/execute', async (req, res) => {
       });
     }
 
-    const languageId = LANGUAGE_IDS[language.toLowerCase()];
+    const pistonLanguage = PISTON_LANGUAGES[language.toLowerCase()];
     
-    if (!languageId) {
+    if (!pistonLanguage) {
       return res.status(400).json({
         success: false,
         error: 'Unsupported language'
       });
     }
 
-    // Real code execution with Judge0
-    const JUDGE0_API = 'https://judge0-ce.p.rapidapi.com';
-    const RAPIDAPI_KEY = process.env.RAPIDAPI_KEY;
+    // Execute code using Piston API (Free, No API Key!)
+    const PISTON_API = 'https://emkc.org/api/v2/piston';
 
-    if (!RAPIDAPI_KEY) {
-      return res.status(500).json({
-        success: false,
-        error: 'Code execution service not configured. Please add RAPIDAPI_KEY to .env file.'
-      });
-    }
-
-    // Submit code
-    const submission = await axios.post(
-      `${JUDGE0_API}/submissions?base64_encoded=true&wait=true`,
+    const response = await axios.post(
+      `${PISTON_API}/execute`,
       {
-        source_code: Buffer.from(code).toString('base64'),
-        language_id: languageId,
-        stdin: Buffer.from(input).toString('base64'),
+        language: pistonLanguage,
+        version: '*', // Use latest version
+        files: [
+          {
+            name: `main.${language === 'python' ? 'py' : language === 'javascript' ? 'js' : language}`,
+            content: code
+          }
+        ],
+        stdin: input,
+        args: [],
+        compile_timeout: 10000,
+        run_timeout: 3000,
+        compile_memory_limit: -1,
+        run_memory_limit: -1
       },
       {
         headers: {
           'Content-Type': 'application/json',
-          'X-RapidAPI-Key': RAPIDAPI_KEY,
-          'X-RapidAPI-Host': 'judge0-ce.p.rapidapi.com',
         },
+        timeout: 10000
       }
     );
 
-    const result = submission.data;
+    const result = response.data;
 
     res.json({
       success: true,
       data: {
-        output: result.stdout ? Buffer.from(result.stdout, 'base64').toString() : '',
-        error: result.stderr ? Buffer.from(result.stderr, 'base64').toString() : '',
-        status: result.status.description,
-        executionTime: result.time ? `${result.time}s` : 'N/A',
-        memory: result.memory ? `${result.memory}KB` : 'N/A'
+        output: result.run?.stdout || '',
+        error: result.run?.stderr || result.compile?.stderr || '',
+        status: result.run?.code === 0 ? 'Accepted' : 'Error',
+        executionTime: 'N/A',
+        memory: 'N/A'
       }
     });
 
