@@ -79,10 +79,15 @@ router.post('/execute', async (req, res) => {
 
 
   } catch (error) {
-    console.error('Code execution error:', error);
+    console.error('Code execution error:', error.message);
+    console.error('Error details:', {
+      status: error.response?.status,
+      data: error.response?.data,
+      code: error.code
+    });
     
     // Handle timeout errors specifically
-    if (error.response?.status === 504 || error.code === 'ETIMEDOUT') {
+    if (error.response?.status === 504 || error.code === 'ETIMEDOUT' || error.code === 'ECONNABORTED') {
       return res.status(504).json({
         success: false,
         error: 'Code execution timed out',
@@ -90,10 +95,19 @@ router.post('/execute', async (req, res) => {
       });
     }
     
+    // Handle network errors
+    if (error.code === 'ENOTFOUND' || error.code === 'ECONNREFUSED') {
+      return res.status(503).json({
+        success: false,
+        error: 'Service unavailable',
+        message: 'Unable to connect to code execution service. Please try again later.'
+      });
+    }
+    
     res.status(500).json({
       success: false,
       error: 'Code execution failed',
-      message: error.response?.data?.messages || error.message
+      message: error.response?.data?.message || error.message || 'An unexpected error occurred'
     });
   }
 });
