@@ -26,13 +26,13 @@ const EnrollmentManagement = () => {
       
       // Fetch students from Firestore via backend
       const studentsRes = await axios.get(
-        `${import.meta.env.VITE_API_URL}/api/enrollment/students`,
+        `${import.meta.env.VITE_API_URL}/enrollment/students`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       
       // Fetch courses
       const coursesRes = await axios.get(
-        `${import.meta.env.VITE_API_URL}/api/courses`
+        `${import.meta.env.VITE_API_URL}/courses`
       );
       
       setStudents(studentsRes.data.data || []);
@@ -72,7 +72,7 @@ const EnrollmentManagement = () => {
       const token = await user.getIdToken();
 
       await axios.post(
-        `${import.meta.env.VITE_API_URL}/api/enrollment/bulk-enroll-selected`,
+        `${import.meta.env.VITE_API_URL}/enrollment/bulk-enroll-selected`,
         {
           courseId: selectedCourse,
           studentIds: selectedStudents
@@ -106,7 +106,7 @@ const EnrollmentManagement = () => {
       const token = await user.getIdToken();
 
       const response = await axios.post(
-        `${import.meta.env.VITE_API_URL}/api/enrollment/bulk-enroll`,
+        `${import.meta.env.VITE_API_URL}/enrollment/bulk-enroll`,
         { courseId: selectedCourse },
         { headers: { Authorization: `Bearer ${token}` } }
       );
