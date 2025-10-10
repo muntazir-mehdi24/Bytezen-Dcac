@@ -22,6 +22,7 @@ import courseRoutes from './routes/courseRoutes.js';
 import progressRoutes from './routes/progressRoutes.js';
 import codeRoutes from './routes/codeRoutes.js';
 import attendanceRoutes from './routes/attendanceRoutes.js';
+import enrollmentRoutes from './routes/enrollmentRoutes.js';
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -69,6 +70,7 @@ app.use('/api/courses', courseRoutes);
 app.use('/api/progress', progressRoutes);
 app.use('/api/code', codeRoutes);
 app.use('/api/attendance', attendanceRoutes);
+app.use('/api/enrollment', enrollmentRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {

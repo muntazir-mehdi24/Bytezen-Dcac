@@ -21,6 +21,7 @@ import ContactPage from './pages/ContactPage';
 import ProblemPage from './pages/problems/ProblemPage';
 import QuizPage from './pages/quiz/QuizPage';
 import CAMS from './pages/CAMS';
+import EnrollmentManagement from './pages/admin/EnrollmentManagement';
 
 // Main App Component with AuthProvider
 function App() {
@@ -109,6 +110,13 @@ function AppRoutes() {
         <ProtectedRoute>
           <Layout>
             <ByteLogPage />
+          </Layout>
+        </ProtectedRoute>
+      } />
+      <Route path="/admin/enrollments" element={
+        <ProtectedRoute>
+          <Layout>
+            <EnrollmentManagement />
           </Layout>
         </ProtectedRoute>
       } />

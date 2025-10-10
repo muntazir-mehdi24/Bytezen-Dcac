@@ -253,7 +253,8 @@ export const getCourseAttendance = async (req, res) => {
             // Check if enrolled in this course
             if (Array.isArray(student.enrolledCourses)) {
               return student.enrolledCourses.includes(courseId) || 
-                     student.enrolledCourses.includes(parseInt(courseId));
+                     student.enrolledCourses.includes(parseInt(courseId)) ||
+                     student.enrolledCourses.includes(String(courseId));
             }
             return false;
           })
