@@ -2722,6 +2722,982 @@ multiplication_table(5)
                 ]
               }
             ]
+          },
+          { 
+            id: '1-4', 
+            title: 'Day 4: Strings and Lists in Python', 
+            duration: '2 Articles • 10 Problems • 20 MCQs',
+            type: 'day',
+            completed: false,
+            articles: [
+              {
+                id: '1-4-a1',
+                title: 'Python String',
+                completed: false,
+                content: `# Python String
+
+In Python, a string is a sequence of characters enclosed in quotes. It can include letters, numbers, symbols or spaces. Since Python has no separate character type, even a single character is treated as a string with length one. Strings are widely used for text handling and manipulation.
+
+## Creating a String
+
+Strings can be created using either single (\`'...'\`) or double (\`"..."\`) quotes. Both behave the same.
+
+**Example:** Creating two equivalent strings one with single and other with double quotes.
+
+\`\`\`python
+s1 = 'GfG'  # single quote
+s2 = "GfG"  # double quote
+print(s1)
+print(s2)
+\`\`\`
+
+**Output:**
+\`\`\`
+GfG
+GfG
+\`\`\`
+
+## Multi-line Strings
+
+Use triple quotes (\`'''...'''\`) or (\`"""..."""\`) for strings that span multiple lines. Newlines are preserved.
+
+**Example:** Define and print multi-line strings using both styles.
+
+\`\`\`python
+s = """I am Learning
+Python String on GeeksforGeeks"""
+print(s)
+
+s = '''I'm a 
+Geek'''
+print(s)
+\`\`\`
+
+**Output:**
+\`\`\`
+I am Learning
+Python String on GeeksforGeeks
+I'm a 
+Geek
+\`\`\`
+
+## Accessing characters in String
+
+Strings are indexed sequences. Positive indices start at 0 from the left; negative indices start at -1 from the right.
+
+**Example 1:** Access specific characters through positive indexing.
+
+\`\`\`python
+s = "GeeksforGeeks"
+print(s[0])   # first character
+print(s[4])   # 5th character
+\`\`\`
+
+**Output:**
+\`\`\`
+G
+s
+\`\`\`
+
+**Note:** Accessing an index out of range will cause an IndexError. Only integers are allowed as indices and using a float or other types will result in a TypeError.
+
+**Example 2:** Read characters from the end using negative indices.
+
+\`\`\`python
+s = "GeeksforGeeks"
+print(s[-10])   # 3rd character
+print(s[-5])    # 5th character from end
+\`\`\`
+
+**Output:**
+\`\`\`
+k
+G
+\`\`\`
+
+## String Slicing
+
+Slicing is a way to extract a portion of a string by specifying the start and end indexes. The syntax for slicing is \`string[start:end]\`, where start is the starting index and end is the stopping index (excluded).
+
+**Example:** Slicing through range and reversing a string.
+
+\`\`\`python
+s = "GeeksforGeeks"
+print(s[1:4])    # characters from index 1 to 3
+print(s[:3])     # from start to index 2
+print(s[3:])     # from index 3 to end
+print(s[::-1])   # reverse string
+\`\`\`
+
+**Output:**
+\`\`\`
+eek
+Gee
+ksforGeeks
+skeeGrofskeeG
+\`\`\`
+
+## String Iteration
+
+Strings are iterable; you can loop through characters one by one.
+
+**Example:** Print each character on its own line.
+
+\`\`\`python
+s = "Python"
+for char in s:
+    print(char)
+\`\`\`
+
+**Output:**
+\`\`\`
+P
+y
+t
+h
+o
+n
+\`\`\`
+
+**Explanation:** for loop pulls characters in order and each iteration prints the next character.
+
+## String Immutability
+
+Strings are immutable, which means that they cannot be changed after they are created. If we need to manipulate strings then we can use methods like concatenation, slicing or formatting to create new strings based on original.
+
+**Example:** Changing first character by building a new string.
+
+\`\`\`python
+s = "geeksforGeeks"
+s = "G" + s[1:]   # create new string
+print(s)
+\`\`\`
+
+**Output:**
+\`\`\`
+GeeksforGeeks
+\`\`\`
+
+## Deleting a String
+
+In Python, it is not possible to delete individual characters from a string since strings are immutable. However, we can delete an entire string variable using the \`del\` keyword.
+
+**Example:** Using del keyword to delete a string.
+
+\`\`\`python
+s = "GfG"
+del s
+\`\`\`
+
+**Note:** After deleting the string if we try to access s then it will result in a NameError because variable no longer exists.
+
+## Updating a String
+
+As strings are immutable, "updates" create new strings using slicing or methods such as \`replace()\`.
+
+**Example:** Fix the first letter and replace a word.
+
+\`\`\`python
+s = "hello geeks"
+s1 = "H" + s[1:]                   # update first character
+s2 = s.replace("geeks", "GeeksforGeeks")  # replace word
+print(s1)
+print(s2)
+\`\`\`
+
+**Output:**
+\`\`\`
+Hello geeks
+hello GeeksforGeeks
+\`\`\`
+
+**Explanation:**
+- **s1:** slice from index 1 onward and prepend "H".
+- **s2:** \`replace("geeks", "GeeksforGeeks")\` returns a new string.
+
+## Common String Methods
+
+Python provides various built-in methods to manipulate strings. Below are some of the most useful methods:
+
+### 1. len()
+
+The \`len()\` function returns the total number of characters in a string (including spaces and punctuation).
+
+\`\`\`python
+s = "GeeksforGeeks"
+print(len(s))
+\`\`\`
+
+**Output:** \`13\`
+
+### 2. upper() and lower()
+
+\`upper()\` method converts all characters to uppercase whereas, \`lower()\` method converts all characters to lowercase.
+
+\`\`\`python
+s = "Hello World"
+print(s.upper())
+print(s.lower())
+\`\`\`
+
+**Output:**
+\`\`\`
+HELLO WORLD
+hello world
+\`\`\`
+
+### 3. strip() and replace()
+
+\`strip()\` removes leading and trailing whitespace from the string and \`replace()\` replaces all occurrences of a specified substring with another.
+
+\`\`\`python
+s = "   Gfg   "
+print(s.strip())    
+
+s = "Python is fun"
+print(s.replace("fun", "awesome"))
+\`\`\`
+
+**Output:**
+\`\`\`
+Gfg
+Python is awesome
+\`\`\`
+
+## Concatenating and Repeating Strings
+
+We can concatenate strings using \`+\` operator and repeat them using \`*\` operator.
+
+### 1. Concatenation
+
+Strings can be combined by using \`+\` operator.
+
+**Example:** Join two words with a space.
+
+\`\`\`python
+s1 = "Hello"
+s2 = "World"
+print(s1 + " " + s2)
+\`\`\`
+
+**Output:** \`Hello World\`
+
+### 2. Repetition
+
+We can repeat a string multiple times using \`*\` operator.
+
+**Example:** Repeat a greeting three times.
+
+\`\`\`python
+s = "Hello "
+print(s * 3)
+\`\`\`
+
+**Output:** \`Hello Hello Hello\`
+
+## Formatting Strings
+
+Python provides several ways to include variables inside strings.
+
+### 1. Using f-strings
+
+The simplest and most preferred way to format strings is by using f-strings.
+
+**Example:** Embed variables directly using {} placeholders.
+
+\`\`\`python
+name = "Alice"
+age = 22
+print(f"Name: {name}, Age: {age}")
+\`\`\`
+
+**Output:** \`Name: Alice, Age: 22\`
+
+### 2. Using format()
+
+Another way to format strings is by using \`format()\` method.
+
+**Example:** Use placeholders {} and pass values positionally.
+
+\`\`\`python
+s = "My name is {} and I am {} years old.".format("Alice", 22)
+print(s)
+\`\`\`
+
+**Output:** \`My name is Alice and I am 22 years old.\`
+
+## String Membership Testing
+
+\`in\` keyword checks if a particular substring is present in a string.
+
+**Example:** Testing for the presence of substrings.
+
+\`\`\`python
+s = "GeeksforGeeks"
+print("Geeks" in s)
+print("GfG" in s)
+\`\`\`
+
+**Output:**
+\`\`\`
+True
+False
+\`\`\`
+`
+              },
+              {
+                id: '1-4-a2',
+                title: 'Python Lists',
+                completed: false,
+                content: `# Python Lists
+
+In Python, a list is a built-in data structure that can hold an ordered collection of items. Unlike arrays in some languages, Python lists are very flexible:
+
+- Can contain duplicate items
+- **Mutable:** items can be modified, replaced, or removed
+- **Ordered:** maintains the order in which items are added
+- **Index-based:** items are accessed using their position (starting from 0)
+- Can store mixed data types (integers, strings, booleans, even other lists)
+
+## Creating a List
+
+Lists can be created in several ways, such as using square brackets, the \`list()\` constructor or by repeating elements.
+
+### 1. Using Square Brackets
+
+We use square brackets \`[]\` to create a list directly.
+
+\`\`\`python
+a = [1, 2, 3, 4, 5] # List of integers
+b = ['apple', 'banana', 'cherry'] # List of strings
+c = [1, 'hello', 3.14, True] # Mixed data types
+
+print(a)
+print(b)
+print(c)
+\`\`\`
+
+**Output:**
+\`\`\`
+[1, 2, 3, 4, 5]
+['apple', 'banana', 'cherry']
+[1, 'hello', 3.14, True]
+\`\`\`
+
+### 2. Using list() Constructor
+
+We can also create a list by passing an iterable (like a tuple, string or another list) to the \`list()\` function.
+
+\`\`\`python
+a = list((1, 2, 3, 'apple', 4.5))  
+print(a)
+
+b = list("GFG")
+print(b)
+\`\`\`
+
+**Output:**
+\`\`\`
+[1, 2, 3, 'apple', 4.5]
+['G', 'F', 'G']
+\`\`\`
+
+### 3. Creating List with Repeated Elements
+
+We can use the multiplication operator \`*\` to create a list with repeated items.
+
+\`\`\`python
+a = [2] * 5
+b = [0] * 7
+
+print(a)
+print(b)
+\`\`\`
+
+**Output:**
+\`\`\`
+[2, 2, 2, 2, 2]
+[0, 0, 0, 0, 0, 0, 0]
+\`\`\`
+
+## Accessing List Elements
+
+Elements in a list are accessed using indexing. Python indexes start at 0, so \`a[0]\` gives the first element. Negative indexes allow access from the end (e.g., \`-1\` gives the last element).
+
+\`\`\`python
+a = [10, 20, 30, 40, 50]
+print(a[0])    
+print(a[-1])
+print(a[1:4])   # elements from index 1 to 3
+\`\`\`
+
+**Output:**
+\`\`\`
+10
+50
+[20, 30, 40]
+\`\`\`
+
+## Adding Elements into List
+
+We can add elements to a list using the following methods:
+
+- **append():** Adds an element at the end of the list.
+- **extend():** Adds multiple elements to the end of the list.
+- **insert():** Adds an element at a specific position.
+- **clear():** removes all items.
+
+\`\`\`python
+a = []
+
+a.append(10)  
+print("After append(10):", a)  
+
+a.insert(0, 5)
+print("After insert(0, 5):", a) 
+
+a.extend([15, 20, 25])  
+print("After extend([15, 20, 25]):", a) 
+
+a.clear()
+print("After clear():", a)
+\`\`\`
+
+**Output:**
+\`\`\`
+After append(10): [10]
+After insert(0, 5): [5, 10]
+After extend([15, 20, 25]): [5, 10, 15, 20, 25]
+After clear(): []
+\`\`\`
+
+## Updating Elements into List
+
+Since lists are mutable, we can update elements by accessing them via their index.
+
+\`\`\`python
+a = [10, 20, 30, 40, 50]
+a[1] = 25 
+print(a)
+\`\`\`
+
+**Output:** \`[10, 25, 30, 40, 50]\`
+
+## Removing Elements from List
+
+We can remove elements from a list using:
+
+- **remove():** Removes the first occurrence of an element.
+- **pop():** Removes the element at a specific index or the last element if no index is specified.
+- **del statement:** Deletes an element at a specified index.
+
+\`\`\`python
+a = [10, 20, 30, 40, 50]
+
+a.remove(30)  
+print("After remove(30):", a)
+
+popped_val = a.pop(1)  
+print("Popped element:", popped_val)
+print("After pop(1):", a) 
+
+del a[0]  
+print("After del a[0]:", a)
+\`\`\`
+
+**Output:**
+\`\`\`
+After remove(30): [10, 20, 40, 50]
+Popped element: 20
+After pop(1): [10, 40, 50]
+After del a[0]: [40, 50]
+\`\`\`
+
+## Iterating Over Lists
+
+We can iterate over lists using loops, which is useful for performing actions on each item.
+
+\`\`\`python
+a = ['apple', 'banana', 'cherry']
+for item in a:
+    print(item)
+\`\`\`
+
+**Output:**
+\`\`\`
+apple
+banana
+cherry
+\`\`\`
+
+## Nested Lists
+
+A nested list is a list within another list, which is useful for representing matrices or tables. We can access nested elements by chaining indexes.
+
+\`\`\`python
+matrix = [ [1, 2, 3],
+           [4, 5, 6],
+           [7, 8, 9] ]
+print(matrix[1][2])
+\`\`\`
+
+**Output:** \`6\`
+
+## List Comprehension
+
+List comprehension is a concise way to create lists using a single line of code. It is useful for applying an operation or filter to items in an iterable, such as a list or range.
+
+\`\`\`python
+squares = [x**2 for x in range(1, 6)]
+print(squares)
+\`\`\`
+
+**Output:** \`[1, 4, 9, 16, 25]\`
+
+**Explanation:**
+- \`for x in range(1, 6):\` loops through each number from 1 to 5 (excluding 6).
+- \`x**2:\` squares each number x.
+- \`[ ]:\` collects all the squared numbers into a new list.
+
+## How Python Stores List Elements?
+
+In Python, a list doesn't store actual values directly. Instead, it stores references (pointers) to objects in memory. This means numbers, strings and booleans are separate objects in memory and the list just keeps their addresses.
+
+That's why modifying a mutable element (like another list or dictionary) can change the original object, while immutables remain unaffected.
+
+\`\`\`python
+a = [10, 20, "GfG", 40, True]
+print(a)        
+print(a[0])     
+print(a[1])  
+print(a[2])
+\`\`\`
+
+**Output:**
+\`\`\`
+[10, 20, 'GfG', 40, True]
+10
+20
+GfG
+\`\`\`
+
+**Explanation:**
+- The list \`a\` contains an integer (10, 20 and 40), a string ("GfG") and a boolean (True).
+- Elements are accessed using indexing (\`a[0]\`, \`a[1]\`, etc.).
+- Each element keeps its original type.
+`
+              }
+            ],
+            problems: [
+              {
+                id: '1-4-p1',
+                title: 'Reverse a String',
+                difficulty: 'Easy',
+                description: 'Write a function that takes a string and returns it reversed.',
+                starterCode: `def reverse_string(s):
+    # Write your code here
+    pass
+
+# Test cases
+print(reverse_string("hello"))  # Should output "olleh"
+print(reverse_string("Python"))  # Should output "nohtyP"`,
+                solution: `def reverse_string(s):
+    return s[::-1]`,
+                testCases: [
+                  { input: '"hello"', expectedOutput: '"olleh"' },
+                  { input: '"Python"', expectedOutput: '"nohtyP"' },
+                  { input: '"12345"', expectedOutput: '"54321"' }
+                ]
+              },
+              {
+                id: '1-4-p2',
+                title: 'Count Vowels in String',
+                difficulty: 'Easy',
+                description: 'Write a function that counts the number of vowels (a, e, i, o, u) in a given string (case-insensitive).',
+                starterCode: `def count_vowels(s):
+    # Write your code here
+    pass
+
+# Test cases
+print(count_vowels("hello"))  # Should output 2
+print(count_vowels("Python Programming"))  # Should output 4`,
+                solution: `def count_vowels(s):
+    vowels = "aeiouAEIOU"
+    count = 0
+    for char in s:
+        if char in vowels:
+            count += 1
+    return count`,
+                testCases: [
+                  { input: '"hello"', expectedOutput: '2' },
+                  { input: '"Python Programming"', expectedOutput: '4' },
+                  { input: '"xyz"', expectedOutput: '0' }
+                ]
+              },
+              {
+                id: '1-4-p3',
+                title: 'Check Palindrome',
+                difficulty: 'Easy',
+                description: 'Write a function that checks if a given string is a palindrome (reads the same forwards and backwards).',
+                starterCode: `def is_palindrome(s):
+    # Write your code here
+    pass
+
+# Test cases
+print(is_palindrome("racecar"))  # Should output True
+print(is_palindrome("hello"))    # Should output False`,
+                solution: `def is_palindrome(s):
+    return s == s[::-1]`,
+                testCases: [
+                  { input: '"racecar"', expectedOutput: 'True' },
+                  { input: '"hello"', expectedOutput: 'False' },
+                  { input: '"madam"', expectedOutput: 'True' }
+                ]
+              },
+              {
+                id: '1-4-p4',
+                title: 'Find Maximum in List',
+                difficulty: 'Easy',
+                description: 'Write a function that finds and returns the maximum value in a list of numbers without using the built-in max() function.',
+                starterCode: `def find_max(numbers):
+    # Write your code here
+    pass
+
+# Test cases
+print(find_max([1, 5, 3, 9, 2]))  # Should output 9
+print(find_max([10, 20, 5, 15]))  # Should output 20`,
+                solution: `def find_max(numbers):
+    if not numbers:
+        return None
+    max_val = numbers[0]
+    for num in numbers:
+        if num > max_val:
+            max_val = num
+    return max_val`,
+                testCases: [
+                  { input: '[1, 5, 3, 9, 2]', expectedOutput: '9' },
+                  { input: '[10, 20, 5, 15]', expectedOutput: '20' },
+                  { input: '[-5, -1, -10]', expectedOutput: '-1' }
+                ]
+              },
+              {
+                id: '1-4-p5',
+                title: 'Remove Duplicates from List',
+                difficulty: 'Medium',
+                description: 'Write a function that removes duplicate elements from a list while maintaining the original order.',
+                starterCode: `def remove_duplicates(lst):
+    # Write your code here
+    pass
+
+# Test cases
+print(remove_duplicates([1, 2, 2, 3, 4, 4, 5]))  # Should output [1, 2, 3, 4, 5]
+print(remove_duplicates(['a', 'b', 'a', 'c']))   # Should output ['a', 'b', 'c']`,
+                solution: `def remove_duplicates(lst):
+    result = []
+    for item in lst:
+        if item not in result:
+            result.append(item)
+    return result`,
+                testCases: [
+                  { input: '[1, 2, 2, 3, 4, 4, 5]', expectedOutput: '[1, 2, 3, 4, 5]' },
+                  { input: "['a', 'b', 'a', 'c']", expectedOutput: "['a', 'b', 'c']" }
+                ]
+              },
+              {
+                id: '1-4-p6',
+                title: 'String Word Count',
+                difficulty: 'Easy',
+                description: 'Write a function that counts the number of words in a string. Words are separated by spaces.',
+                starterCode: `def word_count(s):
+    # Write your code here
+    pass
+
+# Test cases
+print(word_count("Hello World"))  # Should output 2
+print(word_count("Python is awesome"))  # Should output 3`,
+                solution: `def word_count(s):
+    if not s.strip():
+        return 0
+    return len(s.split())`,
+                testCases: [
+                  { input: '"Hello World"', expectedOutput: '2' },
+                  { input: '"Python is awesome"', expectedOutput: '3' },
+                  { input: '"   "', expectedOutput: '0' }
+                ]
+              },
+              {
+                id: '1-4-p7',
+                title: 'List Sum and Average',
+                difficulty: 'Easy',
+                description: 'Write a function that takes a list of numbers and returns a tuple containing (sum, average).',
+                starterCode: `def sum_and_average(numbers):
+    # Write your code here
+    pass
+
+# Test cases
+print(sum_and_average([1, 2, 3, 4, 5]))  # Should output (15, 3.0)
+print(sum_and_average([10, 20, 30]))     # Should output (60, 20.0)`,
+                solution: `def sum_and_average(numbers):
+    if not numbers:
+        return (0, 0)
+    total = sum(numbers)
+    avg = total / len(numbers)
+    return (total, avg)`,
+                testCases: [
+                  { input: '[1, 2, 3, 4, 5]', expectedOutput: '(15, 3.0)' },
+                  { input: '[10, 20, 30]', expectedOutput: '(60, 20.0)' }
+                ]
+              },
+              {
+                id: '1-4-p8',
+                title: 'Merge Two Lists Alternately',
+                difficulty: 'Medium',
+                description: 'Write a function that merges two lists by taking elements alternately from each list.',
+                starterCode: `def merge_alternately(list1, list2):
+    # Write your code here
+    pass
+
+# Test cases
+print(merge_alternately([1, 2, 3], ['a', 'b', 'c']))  # Should output [1, 'a', 2, 'b', 3, 'c']
+print(merge_alternately([1, 2], ['a', 'b', 'c', 'd']))  # Should output [1, 'a', 2, 'b', 'c', 'd']`,
+                solution: `def merge_alternately(list1, list2):
+    result = []
+    i = 0
+    while i < len(list1) or i < len(list2):
+        if i < len(list1):
+            result.append(list1[i])
+        if i < len(list2):
+            result.append(list2[i])
+        i += 1
+    return result`,
+                testCases: [
+                  { input: "[1, 2, 3], ['a', 'b', 'c']", expectedOutput: "[1, 'a', 2, 'b', 3, 'c']" },
+                  { input: "[1, 2], ['a', 'b', 'c', 'd']", expectedOutput: "[1, 'a', 2, 'b', 'c', 'd']" }
+                ]
+              },
+              {
+                id: '1-4-p9',
+                title: 'Title Case Converter',
+                difficulty: 'Medium',
+                description: 'Write a function that converts a string to title case (first letter of each word capitalized).',
+                starterCode: `def to_title_case(s):
+    # Write your code here
+    pass
+
+# Test cases
+print(to_title_case("hello world"))  # Should output "Hello World"
+print(to_title_case("python programming"))  # Should output "Python Programming"`,
+                solution: `def to_title_case(s):
+    words = s.split()
+    title_words = [word.capitalize() for word in words]
+    return ' '.join(title_words)`,
+                testCases: [
+                  { input: '"hello world"', expectedOutput: '"Hello World"' },
+                  { input: '"python programming"', expectedOutput: '"Python Programming"' }
+                ]
+              },
+              {
+                id: '1-4-p10',
+                title: 'Flatten Nested List',
+                difficulty: 'Medium',
+                description: 'Write a function that flattens a nested list (list of lists) into a single list.',
+                starterCode: `def flatten_list(nested_list):
+    # Write your code here
+    pass
+
+# Test cases
+print(flatten_list([[1, 2], [3, 4], [5]]))  # Should output [1, 2, 3, 4, 5]
+print(flatten_list([['a'], ['b', 'c'], ['d']]))  # Should output ['a', 'b', 'c', 'd']`,
+                solution: `def flatten_list(nested_list):
+    result = []
+    for sublist in nested_list:
+        for item in sublist:
+            result.append(item)
+    return result`,
+                testCases: [
+                  { input: '[[1, 2], [3, 4], [5]]', expectedOutput: '[1, 2, 3, 4, 5]' },
+                  { input: "[['a'], ['b', 'c'], ['d']]", expectedOutput: "['a', 'b', 'c', 'd']" }
+                ]
+              }
+            ],
+            quiz: [
+              {
+                id: '1-4-quiz',
+                title: 'Day 4: Strings and Lists Quiz',
+                questions: [
+                  {
+                    id: 'q1',
+                    question: 'What is the output of: "Python"[1:4]',
+                    options: ['Pyt', 'yth', 'ytho', 'Pyth'],
+                    correctAnswer: 1,
+                    explanation: 'String slicing [1:4] extracts characters from index 1 to 3 (4 is excluded), giving "yth".'
+                  },
+                  {
+                    id: 'q2',
+                    question: 'Which method is used to convert a string to uppercase?',
+                    options: ['uppercase()', 'upper()', 'toUpper()', 'capitalize()'],
+                    correctAnswer: 1,
+                    explanation: 'The upper() method converts all characters in a string to uppercase.'
+                  },
+                  {
+                    id: 'q3',
+                    question: 'What does the strip() method do?',
+                    options: [
+                      'Removes all spaces from string',
+                      'Removes leading and trailing whitespace',
+                      'Splits the string',
+                      'Reverses the string'
+                    ],
+                    correctAnswer: 1,
+                    explanation: 'strip() removes leading and trailing whitespace from a string, not spaces in the middle.'
+                  },
+                  {
+                    id: 'q4',
+                    question: 'What is the output of: len("Hello World")',
+                    options: ['10', '11', '12', '9'],
+                    correctAnswer: 1,
+                    explanation: 'len() counts all characters including spaces. "Hello World" has 11 characters.'
+                  },
+                  {
+                    id: 'q5',
+                    question: 'Are strings mutable in Python?',
+                    options: ['Yes', 'No', 'Sometimes', 'Depends on the string'],
+                    correctAnswer: 1,
+                    explanation: 'Strings are immutable in Python, meaning they cannot be changed after creation.'
+                  },
+                  {
+                    id: 'q6',
+                    question: 'What is the output of: "Hello" * 3',
+                    options: [
+                      'HelloHelloHello',
+                      'Hello 3',
+                      'HHHeeellllllooo',
+                      'Error'
+                    ],
+                    correctAnswer: 0,
+                    explanation: 'The * operator repeats a string the specified number of times.'
+                  },
+                  {
+                    id: 'q7',
+                    question: 'How do you access the last element of a list?',
+                    options: ['list[last]', 'list[-1]', 'list[end]', 'list.last()'],
+                    correctAnswer: 1,
+                    explanation: 'Negative indexing allows access from the end. list[-1] gives the last element.'
+                  },
+                  {
+                    id: 'q8',
+                    question: 'Which method adds an element to the end of a list?',
+                    options: ['add()', 'append()', 'insert()', 'extend()'],
+                    correctAnswer: 1,
+                    explanation: 'append() adds a single element to the end of a list.'
+                  },
+                  {
+                    id: 'q9',
+                    question: 'What is the output of: [1, 2, 3] + [4, 5]',
+                    options: [
+                      '[1, 2, 3, 4, 5]',
+                      '[5, 7]',
+                      '[[1, 2, 3], [4, 5]]',
+                      'Error'
+                    ],
+                    correctAnswer: 0,
+                    explanation: 'The + operator concatenates two lists into a single list.'
+                  },
+                  {
+                    id: 'q10',
+                    question: 'Are lists mutable in Python?',
+                    options: ['Yes', 'No', 'Sometimes', 'Only if declared mutable'],
+                    correctAnswer: 0,
+                    explanation: 'Lists are mutable, meaning their elements can be changed, added, or removed.'
+                  },
+                  {
+                    id: 'q11',
+                    question: 'What does the pop() method do?',
+                    options: [
+                      'Adds an element',
+                      'Removes and returns an element',
+                      'Sorts the list',
+                      'Clears the list'
+                    ],
+                    correctAnswer: 1,
+                    explanation: 'pop() removes and returns an element at a specified index (or the last element if no index is given).'
+                  },
+                  {
+                    id: 'q12',
+                    question: 'What is the output of: [x**2 for x in range(3)]',
+                    options: ['[0, 1, 4]', '[1, 4, 9]', '[0, 1, 2]', '[1, 2, 3]'],
+                    correctAnswer: 0,
+                    explanation: 'List comprehension squares each number from 0 to 2, giving [0, 1, 4].'
+                  },
+                  {
+                    id: 'q13',
+                    question: 'What is the difference between append() and extend()?',
+                    options: [
+                      'No difference',
+                      'append() adds one element, extend() adds multiple elements',
+                      'extend() adds one element, append() adds multiple',
+                      'append() is faster'
+                    ],
+                    correctAnswer: 1,
+                    explanation: 'append() adds a single element (even if it\'s a list), while extend() adds each element from an iterable.'
+                  },
+                  {
+                    id: 'q14',
+                    question: 'What is the output of: "Python".replace("P", "J")',
+                    options: ['Python', 'Jython', 'JPython', 'Error'],
+                    correctAnswer: 1,
+                    explanation: 'replace() replaces all occurrences of the first argument with the second, giving "Jython".'
+                  },
+                  {
+                    id: 'q15',
+                    question: 'How do you create an empty list?',
+                    options: ['list()', '[]', 'Both A and B', 'empty()'],
+                    correctAnswer: 2,
+                    explanation: 'Both list() and [] create an empty list in Python.'
+                  },
+                  {
+                    id: 'q16',
+                    question: 'What does "Python" in "I love Python" return?',
+                    options: ['True', 'False', '1', 'Error'],
+                    correctAnswer: 0,
+                    explanation: 'The "in" operator checks if a substring exists in a string and returns True if found.'
+                  },
+                  {
+                    id: 'q17',
+                    question: 'What is the output of: [1, 2, 3][1:3]',
+                    options: ['[1, 2]', '[2, 3]', '[1, 2, 3]', '[2]'],
+                    correctAnswer: 1,
+                    explanation: 'List slicing [1:3] extracts elements from index 1 to 2 (3 is excluded), giving [2, 3].'
+                  },
+                  {
+                    id: 'q18',
+                    question: 'Which of the following creates a list with 5 zeros?',
+                    options: ['[0] * 5', '[0, 5]', 'list(0, 5)', 'zeros(5)'],
+                    correctAnswer: 0,
+                    explanation: 'The * operator repeats a list element, so [0] * 5 creates [0, 0, 0, 0, 0].'
+                  },
+                  {
+                    id: 'q19',
+                    question: 'What is the output of: "hello".capitalize()',
+                    options: ['HELLO', 'Hello', 'hello', 'HeLLo'],
+                    correctAnswer: 1,
+                    explanation: 'capitalize() converts the first character to uppercase and the rest to lowercase.'
+                  },
+                  {
+                    id: 'q20',
+                    question: 'What does the clear() method do to a list?',
+                    options: [
+                      'Removes the first element',
+                      'Removes the last element',
+                      'Removes all elements',
+                      'Sorts the list'
+                    ],
+                    correctAnswer: 2,
+                    explanation: 'clear() removes all elements from a list, making it empty.'
+                  }
+                ]
+              }
+            ]
           }
         ]
       }
