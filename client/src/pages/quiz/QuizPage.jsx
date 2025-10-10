@@ -354,14 +354,19 @@ const QuizPage = () => {
   const [quiz, setQuiz] = useState(null);
 
   useEffect(() => {
-    // In production, fetch from API
-    const quizData = quizzesData[quizId];
-    if (quizData) {
-      setQuiz(quizData);
+    // Check if quiz data is passed via location state
+    if (location.state && location.state.quiz) {
+      setQuiz(location.state.quiz);
     } else {
-      navigate('/courses');
+      // Fallback to local quizzesData
+      const quizData = quizzesData[quizId];
+      if (quizData) {
+        setQuiz(quizData);
+      } else {
+        navigate('/courses');
+      }
     }
-  }, [quizId, navigate]);
+  }, [quizId, navigate, location.state]);
 
   const handleComplete = (result) => {
     console.log('Quiz completed:', result);

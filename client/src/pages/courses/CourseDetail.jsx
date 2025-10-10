@@ -4074,6 +4074,7 @@ const CourseDetail = () => {
                               key={problem.id}
                               to={`/problems/${problem.id}`}
                               state={{ 
+                                problem: problem,
                                 fromCourse: id, 
                                 fromModule: currentModule?.id,
                                 fromLesson: currentLesson?.id,
@@ -4104,6 +4105,7 @@ const CourseDetail = () => {
                               key={quiz.id}
                               to={`/quiz/${quiz.id}`}
                               state={{ 
+                                quiz: quiz,
                                 fromCourse: id, 
                                 fromModule: currentModule?.id,
                                 fromLesson: currentLesson?.id,

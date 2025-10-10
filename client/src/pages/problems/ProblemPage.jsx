@@ -674,15 +674,20 @@ const ProblemPage = () => {
   const [problem, setProblem] = useState(null);
 
   useEffect(() => {
-    // In production, fetch from API
-    const problemData = problemsData[problemId];
-    if (problemData) {
-      setProblem(problemData);
+    // Check if problem data is passed via location state
+    if (location.state && location.state.problem) {
+      setProblem(location.state.problem);
     } else {
-      // Redirect to problems list if not found
-      navigate('/problems');
+      // Fallback to local problemsData
+      const problemData = problemsData[problemId];
+      if (problemData) {
+        setProblem(problemData);
+      } else {
+        // Redirect to problems list if not found
+        navigate('/courses');
+      }
     }
-  }, [problemId, navigate]);
+  }, [problemId, navigate, location.state]);
 
   const handleSubmit = (result) => {
     console.log('Submission result:', result);
