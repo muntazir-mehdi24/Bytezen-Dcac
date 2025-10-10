@@ -30,13 +30,18 @@ const EnrollmentManagement = () => {
         { headers: { Authorization: `Bearer ${token}` } }
       );
       
-      // Fetch courses
-      const coursesRes = await axios.get(
-        `${import.meta.env.VITE_API_URL}/courses`
-      );
-      
       setStudents(studentsRes.data.data || []);
-      setCourses(coursesRes.data.data || []);
+      
+      // Use hardcoded courses for now (since they're not in MongoDB)
+      const hardcodedCourses = [
+        { _id: '1', title: 'AI/ML Mastery' },
+        { _id: '2', title: 'Web Development Bootcamp' },
+        { _id: '3', title: 'Data Science Fundamentals' },
+        { _id: '4', title: 'Python Programming' },
+        { _id: '5', title: 'JavaScript Essentials' }
+      ];
+      
+      setCourses(hardcodedCourses);
     } catch (error) {
       console.error('Error fetching data:', error);
     } finally {
