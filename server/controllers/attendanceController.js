@@ -229,19 +229,42 @@ export const getCourseAttendance = async (req, res) => {
     try {
       if (admin.apps.length > 0) {
         const db = admin.firestore();
-        const usersSnapshot = await db.collection('users')
-          .where('enrolledCourses', 'array-contains', courseId)
-          .get();
-
-        enrolledStudents = usersSnapshot.docs.map(doc => {
-          const data = doc.data();
-          return {
-            uid: data.userId || doc.id,
-            name: data.name || 'Unknown',
-            email: data.email || '',
-            enrolledAt: data.createdAt || new Date()
-          };
-        });
+        console.log('Fetching students from Firestore for courseId:', courseId);
+        
+        // Get all users and filter on the client side for more flexibility
+        const usersSnapshot = await db.collection('users').get();
+        
+        enrolledStudents = usersSnapshot.docs
+          .map(doc => {
+            const data = doc.data();
+            return {
+              uid: data.userId || doc.id,
+              name: data.name || 'Unknown',
+              email: data.email || '',
+              role: data.role || 'student',
+              enrolledCourses: data.enrolledCourses || [],
+              enrolledAt: data.createdAt || new Date()
+            };
+          })
+          .filter(student => {
+            // Only include students (not instructors/admins)
+            if (student.role !== 'student') return false;
+            
+            // Check if enrolled in this course
+            if (Array.isArray(student.enrolledCourses)) {
+              return student.enrolledCourses.includes(courseId) || 
+                     student.enrolledCourses.includes(parseInt(courseId));
+            }
+            return false;
+          })
+          .map(student => ({
+            uid: student.uid,
+            name: student.name,
+            email: student.email,
+            enrolledAt: student.enrolledAt
+          }));
+        
+        console.log(`Found ${enrolledStudents.length} enrolled students in Firestore`);
       }
     } catch (firestoreError) {
       console.log('Firestore fetch failed, trying MongoDB:', firestoreError.message);
