@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/FirebaseAuthContext';
 
@@ -11,11 +11,18 @@ const Login = () => {
   const [error, setError] = useState('');
   const navigate = useNavigate();
   const location = useLocation();
-  const { login, loginWithGoogle } = useAuth();
+  const { login, loginWithGoogle, isAuthenticated, loading: authLoading } = useAuth();
   
   // Get the redirect location or default to '/dashboard'
   const from = location.state?.from?.pathname || '/dashboard';
   const redirectMessage = new URLSearchParams(location.search).get('message');
+
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (!authLoading && isAuthenticated) {
+      navigate(from, { replace: true });
+    }
+  }, [isAuthenticated, authLoading, navigate, from]);
 
   const { email, password } = formData;
 
