@@ -41,9 +41,22 @@ api.interceptors.request.use(
 // Add a response interceptor to handle 401 Unauthorized responses
 api.interceptors.response.use(
   (response) => response,
-  (error) => {
+  async (error) => {
     if (error.response?.status === 401) {
-      // Clear auth data and redirect to login
+      // Don't redirect if we're using Firebase auth
+      try {
+        const { getAuth } = await import('firebase/auth');
+        const auth = getAuth();
+        if (auth.currentUser) {
+          // User is authenticated with Firebase, don't redirect
+          // The token might just need to be refreshed
+          return Promise.reject(error);
+        }
+      } catch (err) {
+        console.error('Error checking Firebase auth:', err);
+      }
+      
+      // Only clear and redirect if not using Firebase auth
       localStorage.removeItem('token');
       localStorage.removeItem('user');
       window.location.href = '/login';
