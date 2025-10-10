@@ -2453,8 +2453,275 @@ Feline
 `
               }
             ],
-            problems: [],
-            quiz: []
+            problems: [
+              {
+                id: '1-3-p1',
+                title: 'Sum of Even Numbers',
+                difficulty: 'Easy',
+                description: 'Write a function that takes a number n and returns the sum of all even numbers from 1 to n using a for loop.',
+                starterCode: `def sum_even_numbers(n):
+    # Write your code here
+    pass
+
+# Test cases
+print(sum_even_numbers(10))  # Should output 30 (2+4+6+8+10)
+print(sum_even_numbers(5))   # Should output 6 (2+4)`,
+                solution: `def sum_even_numbers(n):
+    total = 0
+    for i in range(1, n + 1):
+        if i % 2 == 0:
+            total += i
+    return total`,
+                testCases: [
+                  { input: '10', expectedOutput: '30' },
+                  { input: '5', expectedOutput: '6' },
+                  { input: '20', expectedOutput: '110' }
+                ]
+              },
+              {
+                id: '1-3-p2',
+                title: 'Factorial Calculator',
+                difficulty: 'Easy',
+                description: 'Write a recursive function to calculate the factorial of a number n.',
+                starterCode: `def factorial(n):
+    # Write your code here
+    pass
+
+# Test cases
+print(factorial(5))  # Should output 120
+print(factorial(0))  # Should output 1
+print(factorial(3))  # Should output 6`,
+                solution: `def factorial(n):
+    if n == 0 or n == 1:
+        return 1
+    else:
+        return n * factorial(n - 1)`,
+                testCases: [
+                  { input: '5', expectedOutput: '120' },
+                  { input: '0', expectedOutput: '1' },
+                  { input: '3', expectedOutput: '6' }
+                ]
+              },
+              {
+                id: '1-3-p3',
+                title: 'Filter Even Numbers with Lambda',
+                difficulty: 'Medium',
+                description: 'Use filter() and lambda to create a function that filters out odd numbers from a list and returns only even numbers.',
+                starterCode: `def get_even_numbers(numbers):
+    # Use filter and lambda here
+    pass
+
+# Test cases
+print(get_even_numbers([1, 2, 3, 4, 5, 6]))  # Should output [2, 4, 6]
+print(get_even_numbers([10, 15, 20, 25]))    # Should output [10, 20]`,
+                solution: `def get_even_numbers(numbers):
+    return list(filter(lambda x: x % 2 == 0, numbers))`,
+                testCases: [
+                  { input: '[1, 2, 3, 4, 5, 6]', expectedOutput: '[2, 4, 6]' },
+                  { input: '[10, 15, 20, 25]', expectedOutput: '[10, 20]' }
+                ]
+              },
+              {
+                id: '1-3-p4',
+                title: 'Create a Student Class',
+                difficulty: 'Medium',
+                description: 'Create a Student class with name and grade attributes. Add a method is_passing() that returns True if grade >= 60, False otherwise.',
+                starterCode: `class Student:
+    # Define __init__ method here
+    
+    # Define is_passing method here
+    pass
+
+# Test cases
+student1 = Student("Alice", 75)
+print(student1.is_passing())  # Should output True
+
+student2 = Student("Bob", 45)
+print(student2.is_passing())  # Should output False`,
+                solution: `class Student:
+    def __init__(self, name, grade):
+        self.name = name
+        self.grade = grade
+    
+    def is_passing(self):
+        return self.grade >= 60`,
+                testCases: [
+                  { input: 'Student("Alice", 75).is_passing()', expectedOutput: 'True' },
+                  { input: 'Student("Bob", 45).is_passing()', expectedOutput: 'False' }
+                ]
+              },
+              {
+                id: '1-3-p5',
+                title: 'Multiplication Table',
+                difficulty: 'Easy',
+                description: 'Write a function that prints the multiplication table for a given number n up to 10 using a while loop.',
+                starterCode: `def multiplication_table(n):
+    # Write your code here using while loop
+    pass
+
+# Test case
+multiplication_table(5)
+# Should output:
+# 5 x 1 = 5
+# 5 x 2 = 10
+# ...
+# 5 x 10 = 50`,
+                solution: `def multiplication_table(n):
+    i = 1
+    while i <= 10:
+        print(f"{n} x {i} = {n * i}")
+        i += 1`,
+                testCases: [
+                  { input: '5', expectedOutput: '5 x 1 = 5\\n5 x 2 = 10\\n5 x 3 = 15\\n5 x 4 = 20\\n5 x 5 = 25\\n5 x 6 = 30\\n5 x 7 = 35\\n5 x 8 = 40\\n5 x 9 = 45\\n5 x 10 = 50' }
+                ]
+              }
+            ],
+            quiz: [
+              {
+                id: '1-3-quiz',
+                title: 'Day 3: Loops, Functions and OOP Quiz',
+                questions: [
+                  {
+                    id: 'q1',
+                    question: 'What is the output of the following code?\n\nfor i in range(3):\n    print(i)',
+                    options: ['0 1 2', '1 2 3', '0 1 2 3', 'Error'],
+                    correctAnswer: 0,
+                    explanation: 'range(3) generates numbers from 0 to 2 (3 is excluded), so the output is 0 1 2.'
+                  },
+                  {
+                    id: 'q2',
+                    question: 'Which keyword is used to define a function in Python?',
+                    options: ['function', 'def', 'func', 'define'],
+                    correctAnswer: 1,
+                    explanation: 'The "def" keyword is used to define a function in Python.'
+                  },
+                  {
+                    id: 'q3',
+                    question: 'What does the "break" statement do in a loop?',
+                    options: [
+                      'Skips the current iteration',
+                      'Exits the loop completely',
+                      'Does nothing',
+                      'Restarts the loop'
+                    ],
+                    correctAnswer: 1,
+                    explanation: 'The "break" statement exits the loop completely and continues with the code after the loop.'
+                  },
+                  {
+                    id: 'q4',
+                    question: 'What is the output of: lambda x: x * 2 applied to 5?',
+                    options: ['5', '10', '25', 'Error'],
+                    correctAnswer: 1,
+                    explanation: 'The lambda function multiplies the input by 2, so 5 * 2 = 10.'
+                  },
+                  {
+                    id: 'q5',
+                    question: 'What is the purpose of the __init__ method in a class?',
+                    options: [
+                      'To delete an object',
+                      'To initialize object attributes',
+                      'To print object details',
+                      'To create a copy of the object'
+                    ],
+                    correctAnswer: 1,
+                    explanation: 'The __init__ method is a constructor that initializes the attributes of an object when it is created.'
+                  },
+                  {
+                    id: 'q6',
+                    question: 'What does the "continue" statement do in a loop?',
+                    options: [
+                      'Exits the loop',
+                      'Skips to the next iteration',
+                      'Pauses the loop',
+                      'Restarts the loop from beginning'
+                    ],
+                    correctAnswer: 1,
+                    explanation: 'The "continue" statement skips the rest of the current iteration and moves to the next iteration of the loop.'
+                  },
+                  {
+                    id: 'q7',
+                    question: 'Which of the following is a valid lambda function?',
+                    options: [
+                      'lambda x, y: x + y',
+                      'lambda(x, y): x + y',
+                      'lambda x y: x + y',
+                      'lambda: x + y'
+                    ],
+                    correctAnswer: 0,
+                    explanation: 'The correct syntax for a lambda function with multiple parameters is: lambda x, y: x + y'
+                  },
+                  {
+                    id: 'q8',
+                    question: 'What is the difference between a class variable and an instance variable?',
+                    options: [
+                      'No difference',
+                      'Class variables are shared by all instances, instance variables are unique to each instance',
+                      'Instance variables are shared, class variables are unique',
+                      'Class variables cannot be modified'
+                    ],
+                    correctAnswer: 1,
+                    explanation: 'Class variables are shared across all instances of a class, while instance variables are unique to each object.'
+                  },
+                  {
+                    id: 'q9',
+                    question: 'What is the output of:\n\nx = 0\nwhile x < 3:\n    x += 1\nprint(x)',
+                    options: ['0', '2', '3', '4'],
+                    correctAnswer: 2,
+                    explanation: 'The loop runs 3 times (x=0, x=1, x=2), incrementing x each time. After the loop, x=3.'
+                  },
+                  {
+                    id: 'q10',
+                    question: 'Which function is used with lambda to apply a function to all items in a list?',
+                    options: ['filter()', 'map()', 'reduce()', 'apply()'],
+                    correctAnswer: 1,
+                    explanation: 'The map() function applies a given function to all items in an iterable and returns a map object.'
+                  },
+                  {
+                    id: 'q11',
+                    question: 'What is recursion in programming?',
+                    options: [
+                      'A loop that never ends',
+                      'A function that calls itself',
+                      'A function with no parameters',
+                      'A function that returns nothing'
+                    ],
+                    correctAnswer: 1,
+                    explanation: 'Recursion is when a function calls itself to solve a problem by breaking it down into smaller subproblems.'
+                  },
+                  {
+                    id: 'q12',
+                    question: 'What is the output of:\n\nfor i in range(2, 5):\n    print(i, end=" ")',
+                    options: ['2 3 4', '2 3 4 5', '1 2 3 4', '0 1 2 3 4'],
+                    correctAnswer: 0,
+                    explanation: 'range(2, 5) generates numbers from 2 to 4 (5 is excluded), so the output is 2 3 4.'
+                  },
+                  {
+                    id: 'q13',
+                    question: 'Which of the following is NOT a valid function argument type in Python?',
+                    options: [
+                      'Default arguments',
+                      'Keyword arguments',
+                      'Positional arguments',
+                      'Static arguments'
+                    ],
+                    correctAnswer: 3,
+                    explanation: 'Python supports default, keyword, positional, and arbitrary arguments, but not "static arguments".'
+                  },
+                  {
+                    id: 'q14',
+                    question: 'What is the purpose of the "pass" statement in Python?',
+                    options: [
+                      'To skip a loop iteration',
+                      'To exit a function',
+                      'To create an empty placeholder',
+                      'To pass arguments to a function'
+                    ],
+                    correctAnswer: 2,
+                    explanation: 'The "pass" statement is used as a placeholder for empty code blocks that will be implemented later.'
+                  }
+                ]
+              }
+            ]
           }
         ]
       }
