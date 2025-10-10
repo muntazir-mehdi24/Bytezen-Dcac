@@ -32,13 +32,11 @@ const EnrollmentManagement = () => {
       
       setStudents(studentsRes.data.data || []);
       
-      // Use hardcoded courses for now (since they're not in MongoDB)
+      // Use actual courses from CoursesPage
       const hardcodedCourses = [
         { _id: '1', title: 'AI/ML Mastery' },
-        { _id: '2', title: 'Web Development Bootcamp' },
-        { _id: '3', title: 'Data Science Fundamentals' },
-        { _id: '4', title: 'Python Programming' },
-        { _id: '5', title: 'JavaScript Essentials' }
+        { _id: '2', title: 'Data Analytics' },
+        { _id: '3', title: 'MERN Stack' }
       ];
       
       setCourses(hardcodedCourses);
