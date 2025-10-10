@@ -1943,6 +1943,518 @@ else:
                 ]
               }
             ]
+          },
+          { 
+            id: '1-3', 
+            title: 'Day 3: Loops, Functions and Basic OOP in Python', 
+            duration: '4 Articles • 5 Problems • 14 MCQs',
+            type: 'day',
+            completed: false,
+            articles: [
+              {
+                id: '1-3-a1',
+                title: 'Loops in Python - For, While and Nested Loops',
+                completed: false,
+                content: `# Loops in Python - For, While and Nested Loops
+
+Loops in Python are used to repeat actions efficiently. The main types are For loops (counting through items) and While loops (based on conditions).
+
+## For Loop
+
+For loops is used to iterate over a sequence such as a list, tuple, string or range. It allow to execute a block of code repeatedly, once for each item in the sequence.
+
+\`\`\`python
+n = 4
+for i in range(0, n):
+    print(i)
+\`\`\`
+
+**Output:**
+\`\`\`
+0
+1
+2
+3
+\`\`\`
+
+**Explanation:** This code prints the numbers from 0 to 3 (inclusive) using a for loop that iterates over a range from 0 to n-1 (where n = 4).
+
+### Example: Iterating Over List, Tuple, String and Dictionary
+
+\`\`\`python
+li = ["geeks", "for", "geeks"]
+for x in li:
+    print(x)
+    
+tup = ("geeks", "for", "geeks")
+for x in tup:
+    print(x)
+    
+s = "abc"
+for x in s:
+    print(x)
+    
+d = dict({'x':123, 'y':354})
+for x in d:
+    print("%s  %d" % (x, d[x]))
+    
+set1 = {10, 30, 20}
+for x in set1:
+    print(x),
+\`\`\`
+
+### Iterating by Index of Sequences
+
+\`\`\`python
+li = ["geeks", "for", "geeks"]
+for index in range(len(li)):
+    print(li[index])
+\`\`\`
+
+## While Loop
+
+In Python, a while loop is used to execute a block of statements repeatedly until a given condition is satisfied.
+
+\`\`\`python
+cnt = 0
+while (cnt < 3):
+    cnt = cnt + 1
+    print("Hello Geek")
+\`\`\`
+
+**Output:**
+\`\`\`
+Hello Geek
+Hello Geek
+Hello Geek
+\`\`\`
+
+## Nested Loops
+
+Python programming language allows to use one loop inside another loop which is called nested loop.
+
+\`\`\`python
+for i in range(1, 5):
+    for j in range(i):
+        print(i, end=' ')
+    print()
+\`\`\`
+
+**Output:**
+\`\`\`
+1 
+2 2 
+3 3 3 
+4 4 4 4 
+\`\`\`
+
+## Loop Control Statements
+
+### Continue Statement
+
+The continue statement in Python returns the control to the beginning of the loop.
+
+\`\`\`python
+for letter in 'geeksforgeeks':
+    if letter == 'e' or letter == 's':
+        continue
+    print('Current Letter :', letter)
+\`\`\`
+
+### Break Statement
+
+The break statement in Python brings control out of the loop.
+
+\`\`\`python
+for letter in 'geeksforgeeks':
+    if letter == 'e' or letter == 's':
+        break
+print('Current Letter :', letter)
+\`\`\`
+
+### Pass Statement
+
+We use pass statement in Python to write empty loops.
+
+\`\`\`python
+for letter in 'geeksforgeeks':
+    pass
+print('Last Letter :', letter)
+\`\`\`
+`
+              },
+              {
+                id: '1-3-a2',
+                title: 'Python Functions',
+                completed: false,
+                content: `# Python Functions
+
+Python Functions are a block of statements that does a specific task. The idea is to put some commonly or repeatedly done task together and make a function so that instead of writing the same code again and again for different inputs, we can do the function calls to reuse code contained in it over and over again.
+
+## Defining a Function
+
+We can define a function in Python, using the def keyword.
+
+\`\`\`python
+def fun():
+    print("Welcome to GFG")
+\`\`\`
+
+## Calling a Function
+
+After creating a function in Python we can call it by using the name of the functions followed by parenthesis containing parameters of that particular function.
+
+\`\`\`python
+def fun():
+    print("Welcome to GFG")
+    
+fun() # Driver code to call a function
+\`\`\`
+
+## Function Arguments
+
+Arguments are the values passed inside the parenthesis of the function. A function can have any number of arguments separated by a comma.
+
+\`\`\`python
+def evenOdd(x):
+    if (x % 2 == 0):
+        return "Even"
+    else:
+        return "Odd"
+
+print(evenOdd(16))
+print(evenOdd(7))
+\`\`\`
+
+## Types of Function Arguments
+
+### 1. Default Arguments
+
+A default argument is a parameter that assumes a default value if a value is not provided in the function call for that argument.
+
+\`\`\`python
+def myFun(x, y=50):
+    print("x: ", x)
+    print("y: ", y)
+
+myFun(10)
+\`\`\`
+
+### 2. Keyword Arguments
+
+In keyword arguments, values are passed by explicitly specifying the parameter names, so the order doesn't matter.
+
+\`\`\`python
+def student(fname, lname):
+    print(fname, lname)
+
+student(fname='Geeks', lname='Practice')
+student(lname='Practice', fname='Geeks')
+\`\`\`
+
+### 3. Positional Arguments
+
+In positional arguments, values are assigned to parameters based on their order in the function call.
+
+\`\`\`python
+def nameAge(name, age):
+    print("Hi, I am", name)
+    print("My age is ", age)
+
+print("Case-1:")
+nameAge("Suraj", 27)
+
+print("\\nCase-2:")
+nameAge(27, "Suraj")
+\`\`\`
+
+### 4. Arbitrary Arguments
+
+In Python Arbitrary Keyword Arguments, *args and **kwargs can pass a variable number of arguments to a function.
+
+\`\`\`python
+def myFun(*args, **kwargs):
+    print("Non-Keyword Arguments (*args):")
+    for arg in args:
+        print(arg)
+
+    print("\\nKeyword Arguments (**kwargs):")
+    for key, value in kwargs.items():
+        print(f"{key} == {value}")
+
+myFun('Hey', 'Welcome', first='Geeks', mid='for', last='Geeks')
+\`\`\`
+
+## Return Statement
+
+The return statement ends a function and sends a value back to the caller.
+
+\`\`\`python
+def square_value(num):
+    """This function returns the square value of the entered number"""
+    return num**2
+
+print(square_value(2))
+print(square_value(-4))
+\`\`\`
+
+## Recursive Functions
+
+A recursive function is a function that calls itself to solve a problem.
+
+\`\`\`python
+def factorial(n):
+    if n == 0:  
+        return 1
+    else:
+        return n * factorial(n - 1) 
+      
+print(factorial(4))
+\`\`\`
+`
+              },
+              {
+                id: '1-3-a3',
+                title: 'Python Lambda Functions',
+                completed: false,
+                content: `# Python Lambda Functions
+
+Lambda Functions are anonymous functions means that the function is without a name. As we already know def keyword is used to define a normal function in Python. Similarly, lambda keyword is used to define an anonymous function in Python.
+
+## Syntax
+
+\`\`\`python
+lambda arguments : expression
+\`\`\`
+
+## Example
+
+\`\`\`python
+s1 = 'GeeksforGeeks'
+s2 = lambda func: func.upper()
+print(s2(s1))
+\`\`\`
+
+**Output:** \`GEEKSFORGEEKS\`
+
+## Use Cases of Lambda Functions
+
+### 1. Using with Condition Checking
+
+\`\`\`python
+n = lambda x: "Positive" if x > 0 else "Negative" if x < 0 else "Zero"
+print(n(5))   
+print(n(-3))  
+print(n(0))
+\`\`\`
+
+\`\`\`python
+check = lambda x: "Even" if x % 2 == 0 else "Odd"
+print(check(4))  
+print(check(7))
+\`\`\`
+
+### 2. Using with List Comprehension
+
+\`\`\`python
+li = [lambda arg=x: arg * 10 for x in range(1, 5)]
+for i in li:
+    print(i())
+\`\`\`
+
+### 3. Using for Returning Multiple Results
+
+\`\`\`python
+calc = lambda x, y: (x + y, x * y)
+res = calc(3, 4)
+print(res)
+\`\`\`
+
+### 4. Using with filter()
+
+The filter() function in Python takes in a function and a list as arguments.
+
+\`\`\`python
+n = [1, 2, 3, 4, 5, 6]
+even = filter(lambda x: x % 2 == 0, n)
+print(list(even))
+\`\`\`
+
+### 5. Using with map()
+
+The map() function in Python takes in a function and a list as an argument.
+
+\`\`\`python
+a = [1, 2, 3, 4]
+b = map(lambda x: x * 2, a)
+print(list(b))
+\`\`\`
+
+### 6. Using with reduce()
+
+The reduce() function in Python takes in a function and a list as argument.
+
+\`\`\`python
+from functools import reduce
+a = [1, 2, 3, 4]
+b = reduce(lambda x, y: x * y, a)
+print(b)
+\`\`\`
+
+## Difference Between lambda and def Keyword
+
+\`\`\`python
+# Using lambda
+sq = lambda x: x ** 2
+print(sq(3))
+
+# Using def
+def sqdef(x):
+    return x ** 2
+print(sqdef(3))
+\`\`\`
+
+| Feature | lambda Function | Regular Function (def) |
+|---------|----------------|----------------------|
+| Definition | Single expression with lambda | Multiple lines of code |
+| Name | Anonymous (or named if assigned) | Must have a name |
+| Statements | Single expression only | Can include multiple statements |
+| Documentation | Cannot have a docstring | Can include docstrings |
+| Reusability | Best for short, temporary functions | Better for reusable and complex logic |
+`
+              },
+              {
+                id: '1-3-a4',
+                title: 'Python OOP Basics',
+                completed: false,
+                content: `# Python OOP Basics
+
+Object Oriented Programming is a fundamental concept in Python, empowering developers to build modular, maintainable, and scalable applications.
+
+## OOPs Concepts in Python
+
+- Class in Python
+- Objects in Python
+- Polymorphism in Python
+- Encapsulation in Python
+- Inheritance in Python
+- Data Abstraction in Python
+
+## Python Class
+
+A class is a collection of objects. Classes are blueprints for creating objects. A class defines a set of attributes and methods that the created objects (instances) can have.
+
+### Creating a Class
+
+\`\`\`python
+class Dog:
+    species = "Canine"  # Class attribute
+
+    def __init__(self, name, age):
+        self.name = name  # Instance attribute
+        self.age = age  # Instance attribute
+\`\`\`
+
+## Python Objects
+
+An Object is an instance of a Class. It represents a specific implementation of the class and holds its own data.
+
+### Creating Object
+
+\`\`\`python
+class Dog:
+    species = "Canine"  # Class attribute
+
+    def __init__(self, name, age):
+        self.name = name  # Instance attribute
+        self.age = age  # Instance attribute
+
+# Creating an object of the Dog class
+dog1 = Dog("Buddy", 3)
+
+print(dog1.name) 
+print(dog1.species)
+\`\`\`
+
+**Output:**
+\`\`\`
+Buddy
+Canine
+\`\`\`
+
+## __init__ Method
+
+__init__ method is the constructor in Python, automatically called when a new object is created. It initializes the attributes of the class.
+
+\`\`\`python
+class Dog:
+    def __init__(self, name, age):
+        self.name = name
+        self.age = age
+
+dog1 = Dog("Buddy", 3)
+print(dog1.name)
+\`\`\`
+
+## Class and Instance Variables
+
+### Class Variables
+
+These are the variables that are shared across all instances of a class.
+
+### Instance Variables
+
+Variables that are unique to each instance (object) of a class.
+
+\`\`\`python
+class Dog:
+    # Class variable
+    species = "Canine"
+
+    def __init__(self, name, age):
+        # Instance variables
+        self.name = name
+        self.age = age
+
+# Create objects
+dog1 = Dog("Buddy", 3)
+dog2 = Dog("Charlie", 5)
+
+# Access class and instance variables
+print(dog1.species)  # Class variable
+print(dog1.name)     # Instance variable
+print(dog2.name)     # Instance variable
+
+# Modify instance variables
+dog1.name = "Max"
+print(dog1.name)     # Updated instance variable
+
+# Modify class variable
+Dog.species = "Feline"
+print(dog1.species)  # Updated class variable
+print(dog2.species)
+\`\`\`
+
+**Output:**
+\`\`\`
+Canine
+Buddy
+Charlie
+Max
+Feline
+Feline
+\`\`\`
+
+**Explanation:**
+- **Class Variable (species):** Shared by all instances of the class. Changing Dog.species affects all objects.
+- **Instance Variables (name, age):** Defined in the __init__ method. Unique to each instance.
+- **Accessing Variables:** Class variables can be accessed via the class name or an object. Instance variables are accessed via the object.
+- **Updating Variables:** Changing Dog.species affects all instances. Changing dog1.name only affects dog1.
+`
+              }
+            ],
+            problems: [],
+            quiz: []
           }
         ]
       }
