@@ -1,5 +1,21 @@
 import jwt from 'jsonwebtoken';
 import User from '../models/User.js';
+import admin from 'firebase-admin';
+
+// Initialize Firebase Admin if not already initialized
+if (!admin.apps.length) {
+  try {
+    admin.initializeApp({
+      credential: admin.credential.cert({
+        projectId: process.env.FIREBASE_PROJECT_ID || "bytezen-3a7d0",
+        clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+        privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n')
+      })
+    });
+  } catch (error) {
+    console.log('Firebase admin initialization error:', error.message);
+  }
+}
 
 // Protect routes
 export const protect = async (req, res, next) => {
@@ -27,32 +43,41 @@ export const protect = async (req, res, next) => {
 
   try {
     let user;
+    let firebaseUid;
     
+    // Try Firebase token verification first
     try {
-      // Try to verify as JWT token
-      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      const decodedToken = await admin.auth().verifyIdToken(token);
+      firebaseUid = decodedToken.uid;
       
-      // Get user from the token - support both _id and uid
-      if (decoded.id) {
-        user = await User.findById(decoded.id).select('-password');
-      } else if (decoded.uid) {
-        user = await User.findOne({ uid: decoded.uid }).select('-password');
-      }
-    } catch (jwtError) {
-      // JWT verification failed - might be a Firebase token
-      console.log('JWT verification failed:', jwtError.message);
+      // Find user by Firebase UID
+      user = await User.findOne({ uid: firebaseUid }).select('-password');
       
-      // In development mode, create a mock user for testing
-      if (process.env.NODE_ENV === 'development') {
-        console.log('Using development mode - creating mock user');
+      // If user doesn't exist in MongoDB, create a basic user object from Firebase
+      if (!user) {
+        console.log('User not found in MongoDB, using Firebase data');
         user = {
-          _id: 'dev-user-id',
-          uid: 'dev-firebase-uid',
-          email: 'dev@bytezen.com',
-          name: 'Development User',
+          _id: firebaseUid,
+          uid: firebaseUid,
+          email: decodedToken.email,
+          name: decodedToken.name || decodedToken.email?.split('@')[0],
           role: 'student',
           toObject: function() { return this; }
         };
+      }
+    } catch (firebaseError) {
+      // Firebase verification failed, try JWT
+      try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        
+        // Get user from the token - support both _id and uid
+        if (decoded.id) {
+          user = await User.findById(decoded.id).select('-password');
+        } else if (decoded.uid) {
+          user = await User.findOne({ uid: decoded.uid }).select('-password');
+        }
+      } catch (jwtError) {
+        console.log('Both Firebase and JWT verification failed');
       }
     }
     
@@ -60,7 +85,7 @@ export const protect = async (req, res, next) => {
       console.log('No user found after token verification');
       return res.status(401).json({
         success: false,
-        error: 'User not found'
+        error: 'User not found or invalid token'
       });
     }
     
