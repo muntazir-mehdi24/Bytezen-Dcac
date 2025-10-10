@@ -22,15 +22,20 @@ router.get('/students', protect, async (req, res) => {
     const students = usersSnapshot.docs
       .map(doc => {
         const data = doc.data();
+        // Try multiple possible field names for user ID
+        const uid = data.userId || data.uid || data.id || doc.id;
+        
         return {
-          uid: data.userId || doc.id,
-          name: data.name || 'Unknown',
+          uid: uid,
+          name: data.name || data.displayName || 'Unknown',
           email: data.email || '',
           role: data.role || 'student',
           enrolledCourses: data.enrolledCourses || []
         };
       })
       .filter(user => user.role === 'student');
+
+    console.log(`Found ${students.length} students in Firestore`);
 
     res.status(200).json({
       success: true,
