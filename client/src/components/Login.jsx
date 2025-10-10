@@ -14,7 +14,7 @@ const Login = () => {
   const { login, loginWithGoogle, isAuthenticated, loading: authLoading } = useAuth();
   
   // Get the redirect location or default to '/dashboard'
-  const from = location.state?.from?.pathname || '/dashboard';
+  const from = location.state?.from?.pathname || '/';
   const redirectMessage = new URLSearchParams(location.search).get('message');
 
   // Redirect if already authenticated

@@ -78,14 +78,6 @@ const Navbar = () => {
                         <p className="text-sm font-semibold text-gray-900">{userProfile?.name || user?.displayName}</p>
                         <p className="text-xs text-gray-500">{user?.email}</p>
                       </div>
-                      <Link
-                        to="/dashboard"
-                        onClick={() => setShowProfileMenu(false)}
-                        className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                      >
-                        <FaUser className="mr-2" />
-                        Dashboard
-                      </Link>
                       <button
                         onClick={handleLogout}
                         className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100 flex items-center"
@@ -140,7 +132,6 @@ const Navbar = () => {
             </Link>
             <Link to="/courses" className="text-gray-700 hover:text-[#2f8d46] px-4 py-2 text-sm font-medium transition-colors flex items-center">
               <FaBook className="mr-1" />
-              Courses
             </Link>
             <Link to="/events" className="text-gray-700 hover:text-[#2f8d46] px-4 py-2 text-sm font-medium transition-colors flex items-center">
               <FaLaptopCode className="mr-1" />
@@ -150,15 +141,6 @@ const Navbar = () => {
               <FaBriefcase className="mr-1" />
               ByteLogs
             </Link>
-            
-            {isAuthenticated && (
-              <Link
-                to="/dashboard"
-                className="bg-[#2f8d46] hover:bg-[#267a3a] text-white px-4 py-2 rounded text-sm font-medium transition-colors ml-2"
-              >
-                Dashboard
-              </Link>
-            )}
           </div>
 
           {/* Search Bar - Desktop */}
@@ -242,15 +224,6 @@ const Navbar = () => {
             ByteLogs
           </Link>
           
-          {isAuthenticated && (
-            <Link
-              to="/dashboard"
-              className="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-white bg-[#2f8d46] hover:bg-[#267a3a]"
-              onClick={() => setIsOpen(false)}
-            >
-              Dashboard
-            </Link>
-          )}
         </div>
       </div>
     </nav>
