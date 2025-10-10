@@ -1,14 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { initializeApp } from 'firebase/app';
-import { 
-  getAuth, 
-  signInWithEmailAndPassword, 
-  createUserWithEmailAndPassword,
-  signInWithPopup,
-  GoogleAuthProvider,
-  signOut,
-  onAuthStateChanged 
-} from 'firebase/auth';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/FirebaseAuthContext';
 import { 
   getFirestore, 
   collection, 
@@ -22,39 +14,18 @@ import {
   updateDoc,
   serverTimestamp 
 } from 'firebase/firestore';
+import { getAuth } from 'firebase/auth';
 
-// Firebase Configuration
-const __firebase_config = {
-  apiKey: "AIzaSyDGcZtrzx8iukmjsCF9Ikf2gWY8UR9bcOQ",
-  authDomain: "bytezen-3a7d0.firebaseapp.com",
-  projectId: "bytezen-3a7d0",
-  storageBucket: "bytezen-3a7d0.firebasestorage.app",
-  messagingSenderId: "1023451285245",
-  appId: "1:1023451285245:web:cf701527c2afe38806e094",
-  measurementId: "G-QTRRZSRHLX"
-};
-
-const __app_id = "cams-bytezen";
-
-// Initialize Firebase
-const app = initializeApp(__firebase_config);
-const auth = getAuth(app);
-const db = getFirestore(app);
-const googleProvider = new GoogleAuthProvider();
+// Get Firestore instance
+const auth = getAuth();
+const db = getFirestore();
 
 // Main CAMS Component
 const CAMS = () => {
-  const [user, setUser] = useState(null);
+  const navigate = useNavigate();
+  const { user, userProfile, isAuthenticated, loading: authLoading } = useAuth();
   const [userRole, setUserRole] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [authMode, setAuthMode] = useState('login'); // 'login' or 'register'
-
-  // Auth Form States
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [name, setName] = useState('');
-  const [role, setRole] = useState('student');
-  const [error, setError] = useState('');
 
   // App States
   const [courses, setCourses] = useState([]);
@@ -64,38 +35,27 @@ const CAMS = () => {
   const [students, setStudents] = useState([]);
   const [view, setView] = useState('dashboard'); // 'dashboard', 'attendance', 'report', 'history'
 
-  // Initialize Firebase Auth Listener
+  // Redirect to login if not authenticated
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
-      if (firebaseUser) {
-        setUser(firebaseUser);
-        await loadUserRole(firebaseUser.uid);
-      } else {
-        setUser(null);
-        setUserRole(null);
-        setLoading(false);
-      }
-    });
+    if (!authLoading && !isAuthenticated) {
+      navigate('/login', { state: { from: { pathname: '/cams' } } });
+    }
+  }, [authLoading, isAuthenticated, navigate]);
 
-    return () => unsubscribe();
-  }, []);
+  // Load user role when user is available
+  useEffect(() => {
+    if (user && userProfile) {
+      setUserRole(userProfile);
+      setLoading(false);
+    }
+  }, [user, userProfile]);
 
-  // Load User Role from Firestore
+  // Load User Role from Firestore (fallback)
   const loadUserRole = async (uid) => {
     try {
       const userDoc = await getDoc(doc(db, 'users', uid));
       if (userDoc.exists()) {
         setUserRole(userDoc.data());
-      } else {
-        // Create default student profile
-        const newUser = {
-          userId: uid,
-          name: auth.currentUser.displayName || 'User',
-          role: 'student',
-          enrolledCourses: []
-        };
-        await setDoc(doc(db, 'users', uid), newUser);
-        setUserRole(newUser);
       }
       setLoading(false);
     } catch (err) {
@@ -192,14 +152,10 @@ const CAMS = () => {
     }
   };
 
-  const handleLogout = async () => {
-    try {
-      await signOut(auth);
-      setSelectedCourse(null);
-      setView('dashboard');
-    } catch (err) {
-      console.error('Logout error:', err);
-    }
+  const handleLogout = () => {
+    setSelectedCourse(null);
+    setView('dashboard');
+    navigate('/');
   };
 
   // Load Courses
@@ -334,151 +290,18 @@ const CAMS = () => {
     );
   }
 
-  // Auth Screen
-  if (!user) {
+  // Show loading while checking authentication
+  if (authLoading || loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 flex items-center justify-center p-4">
-        <div className="max-w-md w-full">
-          <div className="bg-white rounded-2xl shadow-2xl p-8">
-            {/* Header */}
-            <div className="text-center mb-8">
-              <div className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
-                <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                </svg>
-              </div>
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">CAMS</h1>
-              <p className="text-gray-600">Course Attendance Management System</p>
-            </div>
-
-            {/* Error Message */}
-            {error && (
-              <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
-                {error}
-              </div>
-            )}
-
-            {/* Auth Mode Toggle */}
-            <div className="flex mb-6 bg-gray-100 rounded-lg p-1">
-              <button
-                onClick={() => setAuthMode('login')}
-                className={`flex-1 py-2 rounded-md font-medium transition-all ${
-                  authMode === 'login'
-                    ? 'bg-white text-blue-600 shadow'
-                    : 'text-gray-600'
-                }`}
-              >
-                Login
-              </button>
-              <button
-                onClick={() => setAuthMode('register')}
-                className={`flex-1 py-2 rounded-md font-medium transition-all ${
-                  authMode === 'register'
-                    ? 'bg-white text-blue-600 shadow'
-                    : 'text-gray-600'
-                }`}
-              >
-                Register
-              </button>
-            </div>
-
-            {/* Auth Form */}
-            <form onSubmit={authMode === 'login' ? handleEmailLogin : handleEmailRegister} className="space-y-4">
-              {authMode === 'register' && (
-                <>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
-                    <input
-                      type="text"
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      placeholder="John Doe"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Role</label>
-                    <select
-                      value={role}
-                      onChange={(e) => setRole(e.target.value)}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    >
-                      <option value="student">Student</option>
-                      <option value="instructor">Instructor</option>
-                      <option value="admin">Admin</option>
-                    </select>
-                  </div>
-                </>
-              )}
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="you@example.com"
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Password</label>
-                <input
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="••••••••"
-                  required
-                />
-              </div>
-
-              <button
-                type="submit"
-                className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-3 rounded-lg font-semibold hover:from-blue-700 hover:to-indigo-700 transition-all shadow-lg hover:shadow-xl"
-              >
-                {authMode === 'login' ? 'Login' : 'Register'}
-              </button>
-            </form>
-
-            {/* Divider */}
-            <div className="relative my-6">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-300"></div>
-              </div>
-              <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-white text-gray-500">Or continue with</span>
-              </div>
-            </div>
-
-            {/* Google Login */}
-            <button
-              onClick={handleGoogleLogin}
-              className="w-full flex items-center justify-center gap-3 bg-white border-2 border-gray-300 text-gray-700 py-3 rounded-lg font-semibold hover:bg-gray-50 transition-all"
-            >
-              <svg className="w-5 h-5" viewBox="0 0 24 24">
-                <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-                <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-              </svg>
-              Sign in with Google
-            </button>
-
-            {/* Demo Credentials */}
-            <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
-              <p className="text-xs font-semibold text-blue-900 mb-2">Demo Credentials:</p>
-              <p className="text-xs text-blue-700">Admin: admin@cams.com / admin123</p>
-              <p className="text-xs text-blue-700">Instructor: instructor@cams.com / inst123</p>
-              <p className="text-xs text-blue-700">Student: student@cams.com / student123</p>
-            </div>
-          </div>
-        </div>
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
       </div>
     );
+  }
+
+  // If not authenticated, the useEffect will redirect to login
+  if (!user || !userRole) {
+    return null;
   }
 
   // Main App - Instructor/Admin View
