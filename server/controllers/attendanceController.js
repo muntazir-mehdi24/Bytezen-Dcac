@@ -1,5 +1,6 @@
 import Attendance from '../models/Attendance.js';
 import User from '../models/User.js';
+import admin from 'firebase-admin';
 
 // @desc    Mark attendance for a session
 // @route   POST /api/attendance/mark
@@ -222,11 +223,44 @@ export const getCourseAttendance = async (req, res) => {
     // Get unique sessions
     const sessions = [...new Set(attendance.map(a => a.sessionDate.toISOString().split('T')[0]))];
 
-    // Get enrolled students for this course
-    const enrolledStudents = await User.find({
-      'enrolledCourses.courseId': courseId,
-      'enrolledCourses.status': 'active'
-    }).select('uid name email enrolledCourses');
+    let enrolledStudents = [];
+
+    // Try to get students from Firestore first
+    try {
+      if (admin.apps.length > 0) {
+        const db = admin.firestore();
+        const usersSnapshot = await db.collection('users')
+          .where('enrolledCourses', 'array-contains', courseId)
+          .get();
+
+        enrolledStudents = usersSnapshot.docs.map(doc => {
+          const data = doc.data();
+          return {
+            uid: data.userId || doc.id,
+            name: data.name || 'Unknown',
+            email: data.email || '',
+            enrolledAt: data.createdAt || new Date()
+          };
+        });
+      }
+    } catch (firestoreError) {
+      console.log('Firestore fetch failed, trying MongoDB:', firestoreError.message);
+    }
+
+    // Fallback to MongoDB if Firestore fails or returns no results
+    if (enrolledStudents.length === 0) {
+      const mongoStudents = await User.find({
+        'enrolledCourses.courseId': courseId,
+        'enrolledCourses.status': 'active'
+      }).select('uid name email enrolledCourses');
+
+      enrolledStudents = mongoStudents.map(student => ({
+        uid: student.uid,
+        name: student.name,
+        email: student.email,
+        enrolledAt: student.enrolledCourses.find(c => c.courseId === courseId)?.enrolledAt
+      }));
+    }
 
     res.status(200).json({
       success: true,
@@ -234,12 +268,7 @@ export const getCourseAttendance = async (req, res) => {
         records: attendance,
         stats,
         sessions: sessions.length,
-        enrolledStudents: enrolledStudents.map(student => ({
-          uid: student.uid,
-          name: student.name,
-          email: student.email,
-          enrolledAt: student.enrolledCourses.find(c => c.courseId === courseId)?.enrolledAt
-        }))
+        enrolledStudents
       }
     });
   } catch (error) {
