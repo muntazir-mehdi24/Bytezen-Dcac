@@ -5,28 +5,26 @@ import admin from 'firebase-admin';
 // Initialize Firebase Admin if not already initialized
 if (!admin.apps.length) {
   try {
-    // Check if we have Firebase credentials
-    const hasCredentials = process.env.FIREBASE_PROJECT_ID && 
-                          process.env.FIREBASE_CLIENT_EMAIL && 
-                          process.env.FIREBASE_PRIVATE_KEY;
-    
-    if (hasCredentials) {
-      // Format the private key properly - handle both escaped and unescaped newlines
-      let privateKey = process.env.FIREBASE_PRIVATE_KEY;
-      if (privateKey && !privateKey.includes('\n')) {
-        privateKey = privateKey.replace(/\\n/g, '\n');
-      }
-      
+    // Try to use service account JSON first
+    if (process.env.FIREBASE_SERVICE_ACCOUNT) {
+      const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
+      admin.initializeApp({
+        credential: admin.credential.cert(serviceAccount)
+      });
+      console.log('Firebase Admin initialized with service account JSON');
+    } 
+    // Fallback to individual credentials
+    else if (process.env.FIREBASE_PRIVATE_KEY) {
       admin.initializeApp({
         credential: admin.credential.cert({
-          projectId: process.env.FIREBASE_PROJECT_ID,
+          projectId: process.env.FIREBASE_PROJECT_ID || "bytezen-3a7d0",
           clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-          privateKey: privateKey
+          privateKey: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n')
         })
       });
-      console.log('Firebase Admin initialized successfully');
+      console.log('Firebase Admin initialized with individual credentials');
     } else {
-      console.log('Firebase credentials not found - Firebase auth will not work');
+      console.log('No Firebase credentials found - Firebase features will be limited');
     }
   } catch (error) {
     console.log('Firebase admin initialization error:', error.message);
