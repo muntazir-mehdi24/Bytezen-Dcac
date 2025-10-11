@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { FaSearch, FaChartLine, FaBook, FaCode, FaClipboardCheck, FaClock, FaTrophy, FaEye } from 'react-icons/fa';
 import { progressAPI } from '../../services/api';
 
-const StudentProgressDashboard = ({ courseId }) => {
+const StudentProgressDashboard = ({ courseId: propCourseId }) => {
   const [loading, setLoading] = useState(true);
   const [studentsProgress, setStudentsProgress] = useState([]);
   const [filteredStudents, setFilteredStudents] = useState([]);
@@ -11,9 +11,12 @@ const StudentProgressDashboard = ({ courseId }) => {
   const [detailedProgress, setDetailedProgress] = useState(null);
   const [error, setError] = useState(null);
   const [sortBy, setSortBy] = useState('progress'); // progress, points, time, name
+  const [courseId, setCourseId] = useState(propCourseId || '2'); // Default to course 2 (Data Science)
 
   useEffect(() => {
-    fetchStudentsProgress();
+    if (courseId) {
+      fetchStudentsProgress();
+    }
   }, [courseId]);
 
   useEffect(() => {
@@ -257,6 +260,15 @@ const StudentProgressDashboard = ({ courseId }) => {
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <h2 className="text-2xl font-bold">Student Progress Dashboard</h2>
         <div className="flex items-center gap-4">
+          <select
+            value={courseId}
+            onChange={(e) => setCourseId(e.target.value)}
+            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2f8d46] focus:border-transparent bg-white"
+          >
+            <option value="1">Python Programming</option>
+            <option value="2">Data Science & AI/ML</option>
+            <option value="3">Web Development</option>
+          </select>
           <div className="relative">
             <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
             <input
