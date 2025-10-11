@@ -77,7 +77,22 @@ const Navbar = () => {
                       <div className="px-4 py-2 border-b border-gray-200">
                         <p className="text-sm font-semibold text-gray-900">{userProfile?.name || user?.displayName}</p>
                         <p className="text-xs text-gray-500">{user?.email}</p>
+                        {(userProfile?.role === 'admin' || userProfile?.role === 'instructor') && (
+                          <p className="text-xs text-[#2f8d46] font-semibold mt-1">
+                            {userProfile.role === 'admin' ? '👑 Admin' : '📚 Instructor'}
+                          </p>
+                        )}
                       </div>
+                      {(userProfile?.role === 'admin' || userProfile?.role === 'instructor') && (
+                        <Link
+                          to="/admin"
+                          onClick={() => setShowProfileMenu(false)}
+                          className="w-full text-left px-4 py-2 text-sm text-[#2f8d46] hover:bg-gray-100 flex items-center"
+                        >
+                          <FaUser className="mr-2" />
+                          Admin Dashboard
+                        </Link>
+                      )}
                       <button
                         onClick={handleLogout}
                         className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100 flex items-center"

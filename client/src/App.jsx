@@ -20,7 +20,14 @@ import ContactPage from './pages/ContactPage';
 import ProblemPage from './pages/problems/ProblemPage';
 import QuizPage from './pages/quiz/QuizPage';
 import CAMS from './pages/CAMS';
+import AdminDashboard from './pages/admin/AdminDashboard';
 import EnrollmentManagement from './pages/admin/EnrollmentManagement';
+import StudentProgressDashboard from './pages/admin/StudentProgressDashboard';
+import ManageEvents from './pages/admin/ManageEvents';
+import ManageInsights from './pages/admin/ManageInsights';
+import ManageTestimonials from './pages/admin/ManageTestimonials';
+import ManagePartners from './pages/admin/ManagePartners';
+import ManageCouncil from './pages/admin/ManageCouncil';
 
 // Main App Component with AuthProvider
 function App() {
@@ -105,10 +112,66 @@ function AppRoutes() {
           </Layout>
         </ProtectedRoute>
       } />
+      <Route path="/admin" element={
+        <ProtectedRoute>
+          <Layout>
+            <AdminDashboard />
+          </Layout>
+        </ProtectedRoute>
+      } />
+      <Route path="/admin/enrollment" element={
+        <ProtectedRoute>
+          <Layout>
+            <EnrollmentManagement />
+          </Layout>
+        </ProtectedRoute>
+      } />
       <Route path="/admin/enrollments" element={
         <ProtectedRoute>
           <Layout>
             <EnrollmentManagement />
+          </Layout>
+        </ProtectedRoute>
+      } />
+      <Route path="/admin/progress" element={
+        <ProtectedRoute>
+          <Layout>
+            <StudentProgressDashboard />
+          </Layout>
+        </ProtectedRoute>
+      } />
+      <Route path="/admin/events" element={
+        <ProtectedRoute>
+          <Layout>
+            <ManageEvents />
+          </Layout>
+        </ProtectedRoute>
+      } />
+      <Route path="/admin/insights" element={
+        <ProtectedRoute>
+          <Layout>
+            <ManageInsights />
+          </Layout>
+        </ProtectedRoute>
+      } />
+      <Route path="/admin/testimonials" element={
+        <ProtectedRoute>
+          <Layout>
+            <ManageTestimonials />
+          </Layout>
+        </ProtectedRoute>
+      } />
+      <Route path="/admin/partners" element={
+        <ProtectedRoute>
+          <Layout>
+            <ManagePartners />
+          </Layout>
+        </ProtectedRoute>
+      } />
+      <Route path="/admin/council" element={
+        <ProtectedRoute>
+          <Layout>
+            <ManageCouncil />
           </Layout>
         </ProtectedRoute>
       } />
