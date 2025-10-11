@@ -19,10 +19,16 @@ import passwordResetRoutes from './routes/passwordResetRoutes.js';
 import bytelogRoutes from './routes/bytelogRoutes.js';
 import testimonialRoutes from './routes/testimonialRoutes.js';
 import courseRoutes from './routes/courseRoutes.js';
+import courseContentRoutes from './routes/courseContentRoutes.js';
 import progressRoutes from './routes/progressRoutes.js';
 import codeRoutes from './routes/codeRoutes.js';
 import attendanceRoutes from './routes/attendanceRoutes.js';
 import enrollmentRoutes from './routes/enrollmentRoutes.js';
+import studentRoutes from './routes/studentRoutes.js';
+import eventRoutes from './routes/eventRoutes.js';
+import insightRoutes from './routes/insightRoutes.js';
+import partnerRoutes from './routes/partnerRoutes.js';
+import councilRoutes from './routes/councilRoutes.js';
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -66,11 +72,16 @@ app.use('/api/auth', authRoutes);
 app.use('/api/password-reset', passwordResetRoutes);
 app.use('/api/bytelogs', bytelogRoutes);
 app.use('/api/testimonials', testimonialRoutes);
-app.use('/api/courses', courseRoutes);
+app.use('/api/courses', courseContentRoutes); // Course content management
 app.use('/api/progress', progressRoutes);
 app.use('/api/code', codeRoutes);
 app.use('/api/attendance', attendanceRoutes);
 app.use('/api/enrollment', enrollmentRoutes);
+app.use('/api/students', studentRoutes); // Student management
+app.use('/api/events', eventRoutes); // Events management
+app.use('/api/insights', insightRoutes); // ByteLogs management
+app.use('/api/partners', partnerRoutes); // Partners management
+app.use('/api/council', councilRoutes); // Council management
 
 // Error handling middleware
 app.use((err, req, res, next) => {
