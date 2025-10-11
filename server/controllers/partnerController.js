@@ -1,5 +1,5 @@
-import Partner from '../models/Partner';
-import { uploadFile } from '../middleware/upload';
+import Partner from '../models/Partner.js';
+import { uploadFile } from '../middleware/upload.js';
 
 export const createPartner = async (req, res) => {
   try {
