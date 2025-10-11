@@ -4125,20 +4125,31 @@ const CourseDetail = () => {
                             <FaBook className="mr-2" />
                             Articles ({currentLesson.articles.length})
                           </div>
-                          {currentLesson.articles.map((article) => (
-                            <button
-                              key={article.id}
-                              onClick={() => setViewingArticle(article.content)}
-                              className="w-full text-left px-3 py-2.5 rounded text-sm mb-1 flex items-center transition-colors text-gray-700 hover:bg-gray-50"
-                            >
-                              {article.completed ? (
-                                <FaCheckCircle className="mr-3 text-[#2f8d46] flex-shrink-0" />
-                              ) : (
-                                <div className="w-4 h-4 mr-3 border-2 border-gray-300 rounded-full flex-shrink-0" />
-                              )}
-                              <span className="line-clamp-2">{article.title}</span>
-                            </button>
-                          ))}
+                          {currentLesson.articles.map((article) => {
+                            const isCurrentArticle = viewingArticle === article.content;
+                            return (
+                              <button
+                                key={article.id}
+                                onClick={() => setViewingArticle(article.content)}
+                                className={`w-full text-left px-3 py-2.5 rounded text-sm mb-1 flex items-center transition-colors ${
+                                  isCurrentArticle 
+                                    ? 'bg-green-50 text-[#2f8d46] font-medium border-l-4 border-[#2f8d46]' 
+                                    : 'text-gray-700 hover:bg-gray-50'
+                                }`}
+                              >
+                                {article.completed ? (
+                                  <FaCheckCircle className="mr-3 text-[#2f8d46] flex-shrink-0" />
+                                ) : isCurrentArticle ? (
+                                  <div className="w-4 h-4 mr-3 border-2 border-[#2f8d46] rounded-full flex-shrink-0 bg-[#2f8d46]">
+                                    <div className="w-2 h-2 bg-white rounded-full m-auto mt-0.5" />
+                                  </div>
+                                ) : (
+                                  <div className="w-4 h-4 mr-3 border-2 border-gray-300 rounded-full flex-shrink-0" />
+                                )}
+                                <span className="line-clamp-2">{article.title}</span>
+                              </button>
+                            );
+                          })}
                         </div>
                       )}
                       
@@ -4149,27 +4160,29 @@ const CourseDetail = () => {
                             <FaClipboardList className="mr-2" />
                             Problems ({currentLesson.problems.length})
                           </div>
-                          {currentLesson.problems.map((problem) => (
-                            <Link
-                              key={problem.id}
-                              to={`/problems/${problem.id}`}
-                              state={{ 
-                                problem: problem,
-                                fromCourse: id, 
-                                fromModule: currentModule?.id,
-                                fromLesson: currentLesson?.id,
-                                activeTab: 'problems'
-                              }}
-                              className="w-full text-left px-3 py-2.5 rounded text-sm mb-1 flex items-center transition-colors text-gray-700 hover:bg-gray-50"
-                            >
-                              {problem.completed ? (
-                                <FaCheckCircle className="mr-3 text-[#2f8d46] flex-shrink-0" />
-                              ) : (
-                                <div className="w-4 h-4 mr-3 border-2 border-gray-300 rounded-full flex-shrink-0" />
-                              )}
-                              <span className="line-clamp-2">{problem.title}</span>
-                            </Link>
-                          ))}
+                          {currentLesson.problems.map((problem) => {
+                            return (
+                              <Link
+                                key={problem.id}
+                                to={`/problems/${problem.id}`}
+                                state={{ 
+                                  problem: problem,
+                                  fromCourse: id, 
+                                  fromModule: currentModule?.id,
+                                  fromLesson: currentLesson?.id,
+                                  activeTab: 'problems'
+                                }}
+                                className="w-full text-left px-3 py-2.5 rounded text-sm mb-1 flex items-center transition-colors text-gray-700 hover:bg-gray-50"
+                              >
+                                {problem.completed ? (
+                                  <FaCheckCircle className="mr-3 text-[#2f8d46] flex-shrink-0" />
+                                ) : (
+                                  <div className="w-4 h-4 mr-3 border-2 border-gray-300 rounded-full flex-shrink-0" />
+                                )}
+                                <span className="line-clamp-2">{problem.title}</span>
+                              </Link>
+                            );
+                          })}
                         </div>
                       )}
                       
