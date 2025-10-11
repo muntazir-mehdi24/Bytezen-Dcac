@@ -2,13 +2,11 @@ import mongoose from 'mongoose';
 
 const progressSchema = new mongoose.Schema({
   user: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
+    type: mongoose.Schema.Types.Mixed, // Support both ObjectId and String (for Firebase UIDs)
     required: true
   },
   course: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Course',
+    type: mongoose.Schema.Types.Mixed, // Support both ObjectId and String (for hardcoded course IDs)
     required: true
   },
   completedLessons: [{

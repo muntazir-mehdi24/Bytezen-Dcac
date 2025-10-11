@@ -36,15 +36,18 @@ router.get('/:courseId', protect, async (req, res) => {
 router.post('/:courseId/lesson', protect, async (req, res) => {
   try {
     const { lessonId, completed } = req.body;
+    
+    // Use uid if _id is not an ObjectId (for Firebase users)
+    const userId = req.user._id || req.user.uid;
 
     let progress = await Progress.findOne({
-      user: req.user._id,
+      user: userId,
       course: req.params.courseId
     });
 
     if (!progress) {
       progress = await Progress.create({
-        user: req.user._id,
+        user: userId,
         course: req.params.courseId
       });
     }
@@ -81,7 +84,12 @@ router.post('/:courseId/lesson', protect, async (req, res) => {
 
     res.json({ success: true, data: progress });
   } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+    console.error('Error in mark lesson complete:', error);
+    res.status(500).json({ 
+      success: false, 
+      error: error.message,
+      details: process.env.NODE_ENV === 'development' ? error.stack : undefined
+    });
   }
 });
 
