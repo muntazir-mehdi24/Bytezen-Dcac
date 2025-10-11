@@ -61,9 +61,21 @@ router.post('/:courseId/lesson', protect, async (req, res) => {
     }
 
     // Calculate overall progress
-    const course = await Course.findById(req.params.courseId);
-    const totalLessons = course.modules.reduce((acc, module) => acc + module.lessons.length, 0);
-    progress.overallProgress = Math.round((progress.completedLessons.length / totalLessons) * 100);
+    // Note: For hardcoded courses, we'll calculate progress based on completed items
+    // If course exists in DB, use that, otherwise use a reasonable estimate
+    try {
+      const course = await Course.findById(req.params.courseId);
+      if (course) {
+        const totalLessons = course.modules.reduce((acc, module) => acc + module.lessons.length, 0);
+        progress.overallProgress = Math.round((progress.completedLessons.length / totalLessons) * 100);
+      } else {
+        // For hardcoded courses, just track completion count
+        progress.overallProgress = Math.min(100, progress.completedLessons.length * 5); // Rough estimate
+      }
+    } catch (err) {
+      // If course not found, just track completion count
+      progress.overallProgress = Math.min(100, progress.completedLessons.length * 5);
+    }
 
     await progress.save();
 
