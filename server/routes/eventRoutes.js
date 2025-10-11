@@ -43,29 +43,45 @@ router.get('/', async (req, res, next) => {
 router.post('/', 
   protect, 
   authorize('admin'), 
-  upload.array('images', 10), // Max 10 images
+  upload.single('image'), // Single image for event banner
   async (req, res, next) => {
     try {
-      const { title, description, date } = req.body;
+      const { 
+        title, 
+        description, 
+        date, 
+        time, 
+        location, 
+        eventType, 
+        mode, 
+        registrationLink, 
+        maxParticipants, 
+        isPublished 
+      } = req.body;
       
-      // Upload images to Cloudinary
-      const imageUrls = [];
-      if (req.files && req.files.length > 0) {
-        for (const file of req.files) {
-          const result = await cloudinary.uploader.upload(file.path, {
-            folder: 'bytezen/events',
-            resource_type: 'auto'
-          });
-          imageUrls.push(result.secure_url);
-        }
+      // Upload image to Cloudinary
+      let imageUrl = '';
+      if (req.file) {
+        const result = await cloudinary.uploader.upload(req.file.path, {
+          folder: 'bytezen/events',
+          resource_type: 'auto'
+        });
+        imageUrl = result.secure_url;
       }
 
       const event = await Event.create({
         title,
         description,
         date,
-        images: imageUrls,
-        createdBy: req.user.id
+        time,
+        location,
+        eventType,
+        mode,
+        registrationLink,
+        maxParticipants: maxParticipants ? parseInt(maxParticipants) : undefined,
+        isPublished: isPublished === 'true' || isPublished === true,
+        images: imageUrl ? [imageUrl] : [],
+        createdBy: req.user._id || req.user.id
       });
 
       res.status(201).json({
@@ -73,6 +89,7 @@ router.post('/',
         data: event
       });
     } catch (err) {
+      console.error('Error creating event:', err);
       next(err);
     }
   }
@@ -82,7 +99,7 @@ router.post('/',
 router.put('/:id', 
   protect, 
   authorize('admin'),
-  upload.array('images', 10),
+  upload.single('image'),
   async (req, res, next) => {
     try {
       let event = await Event.findById(req.params.id);
@@ -94,25 +111,45 @@ router.put('/:id',
         });
       }
 
-      // Upload new images to Cloudinary if any
-      const newImageUrls = [];
-      if (req.files && req.files.length > 0) {
-        for (const file of req.files) {
-          const result = await cloudinary.uploader.upload(file.path, {
-            folder: 'bytezen/events',
-            resource_type: 'auto'
-          });
-          newImageUrls.push(result.secure_url);
-        }
+      const { 
+        title, 
+        description, 
+        date, 
+        time, 
+        location, 
+        eventType, 
+        mode, 
+        registrationLink, 
+        maxParticipants, 
+        isPublished 
+      } = req.body;
+
+      // Upload new image to Cloudinary if provided
+      let imageUrl = event.images && event.images.length > 0 ? event.images[0] : '';
+      if (req.file) {
+        const result = await cloudinary.uploader.upload(req.file.path, {
+          folder: 'bytezen/events',
+          resource_type: 'auto'
+        });
+        imageUrl = result.secure_url;
       }
 
       // Update event data
-      const { title, description, date, images: existingImages = [] } = req.body;
-      const images = [...existingImages, ...newImageUrls];
-
       event = await Event.findByIdAndUpdate(
         req.params.id,
-        { title, description, date, images },
+        { 
+          title, 
+          description, 
+          date, 
+          time, 
+          location, 
+          eventType, 
+          mode, 
+          registrationLink, 
+          maxParticipants: maxParticipants ? parseInt(maxParticipants) : undefined,
+          isPublished: isPublished === 'true' || isPublished === true,
+          images: imageUrl ? [imageUrl] : []
+        },
         { new: true, runValidators: true }
       );
 
@@ -121,6 +158,7 @@ router.put('/:id',
         data: event
       });
     } catch (err) {
+      console.error('Error updating event:', err);
       next(err);
     }
   }
@@ -149,11 +187,39 @@ router.delete('/:id',
         }
       }
 
-      await event.remove();
+      await Event.findByIdAndDelete(req.params.id);
 
       res.status(200).json({
         success: true,
         data: {}
+      });
+    } catch (err) {
+      next(err);
+    }
+  }
+);
+
+// Toggle publish status - Protected & Admin only
+router.patch('/:id/toggle', 
+  protect, 
+  authorize('admin'), 
+  async (req, res, next) => {
+    try {
+      const event = await Event.findById(req.params.id);
+
+      if (!event) {
+        return res.status(404).json({
+          success: false,
+          error: 'Event not found'
+        });
+      }
+
+      event.isPublished = !event.isPublished;
+      await event.save();
+
+      res.status(200).json({
+        success: true,
+        data: event
       });
     } catch (err) {
       next(err);
