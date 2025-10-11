@@ -1,12 +1,21 @@
-import Student from '../models/Student.js';
-import User from '../models/User.js';
+import admin from 'firebase-admin';
+
+const db = admin.firestore();
 
 // Get all students
 export const getAllStudents = async (req, res) => {
   try {
-    const students = await Student.find()
-      .populate('enrolledCourses.courseId', 'title')
-      .sort({ createdAt: -1 });
+    const usersSnapshot = await db.collection('users')
+      .where('role', '==', 'student')
+      .get();
+    
+    const students = [];
+    usersSnapshot.forEach(doc => {
+      students.push({
+        id: doc.id,
+        ...doc.data()
+      });
+    });
     
     res.json({
       success: true,
@@ -27,49 +36,34 @@ export const createStudent = async (req, res) => {
     const { name, email, rollNumber, phone, department, division, year } = req.body;
     
     // Check if student already exists
-    const existingStudent = await Student.findOne({ email });
-    if (existingStudent) {
+    const existingUsers = await db.collection('users').where('email', '==', email).get();
+    if (!existingUsers.empty) {
       return res.status(400).json({
         success: false,
         error: 'Student with this email already exists'
       });
     }
     
-    // Generate a unique UID
-    const uid = `STU${Date.now()}`;
-    
-    const student = new Student({
-      uid,
+    // Create student in Firestore
+    const studentData = {
       name,
       email,
-      rollNumber,
-      phone,
-      department,
-      division,
-      year
-    });
+      rollNumber: rollNumber || '',
+      phone: phone || '',
+      department: department || '',
+      division: division || '',
+      year: year || '',
+      role: 'student',
+      createdAt: admin.firestore.FieldValue.serverTimestamp(),
+      updatedAt: admin.firestore.FieldValue.serverTimestamp()
+    };
     
-    await student.save();
-    
-    // Also create a User account if it doesn't exist
-    const existingUser = await User.findOne({ email });
-    if (!existingUser) {
-      const user = new User({
-        uid,
-        email,
-        name,
-        role: 'student',
-        department,
-        division,
-        year
-      });
-      await user.save();
-    }
+    const docRef = await db.collection('users').add(studentData);
     
     res.status(201).json({
       success: true,
       message: 'Student created successfully',
-      data: student
+      data: { id: docRef.id, ...studentData }
     });
   } catch (error) {
     console.error('Error creating student:', error);
@@ -86,40 +80,34 @@ export const updateStudent = async (req, res) => {
     const { id } = req.params;
     const { name, email, rollNumber, phone, department, division, year } = req.body;
     
-    const student = await Student.findOne({ uid: id });
-    if (!student) {
+    const docRef = db.collection('users').doc(id);
+    const doc = await docRef.get();
+    
+    if (!doc.exists) {
       return res.status(404).json({
         success: false,
         error: 'Student not found'
       });
     }
     
-    // Update fields
-    if (name) student.name = name;
-    if (email) student.email = email;
-    if (rollNumber !== undefined) student.rollNumber = rollNumber;
-    if (phone !== undefined) student.phone = phone;
-    if (department !== undefined) student.department = department;
-    if (division !== undefined) student.division = division;
-    if (year !== undefined) student.year = year;
+    const updateData = {
+      updatedAt: admin.firestore.FieldValue.serverTimestamp()
+    };
     
-    await student.save();
+    if (name) updateData.name = name;
+    if (email) updateData.email = email;
+    if (rollNumber !== undefined) updateData.rollNumber = rollNumber;
+    if (phone !== undefined) updateData.phone = phone;
+    if (department !== undefined) updateData.department = department;
+    if (division !== undefined) updateData.division = division;
+    if (year !== undefined) updateData.year = year;
     
-    // Also update User if exists
-    const user = await User.findOne({ uid: id });
-    if (user) {
-      if (name) user.name = name;
-      if (email) user.email = email;
-      if (department !== undefined) user.department = department;
-      if (division !== undefined) user.division = division;
-      if (year !== undefined) user.year = year;
-      await user.save();
-    }
+    await docRef.update(updateData);
     
     res.json({
       success: true,
       message: 'Student updated successfully',
-      data: student
+      data: { id, ...doc.data(), ...updateData }
     });
   } catch (error) {
     console.error('Error updating student:', error);
@@ -135,16 +123,17 @@ export const deleteStudent = async (req, res) => {
   try {
     const { id } = req.params;
     
-    const student = await Student.findOneAndDelete({ uid: id });
-    if (!student) {
+    const docRef = db.collection('users').doc(id);
+    const doc = await docRef.get();
+    
+    if (!doc.exists) {
       return res.status(404).json({
         success: false,
         error: 'Student not found'
       });
     }
     
-    // Also delete User account
-    await User.findOneAndDelete({ uid: id });
+    await docRef.delete();
     
     res.json({
       success: true,
@@ -164,10 +153,9 @@ export const getStudentById = async (req, res) => {
   try {
     const { id } = req.params;
     
-    const student = await Student.findOne({ uid: id })
-      .populate('enrolledCourses.courseId', 'title');
+    const doc = await db.collection('users').doc(id).get();
     
-    if (!student) {
+    if (!doc.exists) {
       return res.status(404).json({
         success: false,
         error: 'Student not found'
@@ -176,7 +164,7 @@ export const getStudentById = async (req, res) => {
     
     res.json({
       success: true,
-      data: student
+      data: { id: doc.id, ...doc.data() }
     });
   } catch (error) {
     console.error('Error fetching student:', error);
