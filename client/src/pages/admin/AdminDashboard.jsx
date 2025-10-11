@@ -45,18 +45,36 @@ const AdminDashboard = () => {
   const fetchDashboardStats = async () => {
     try {
       // Fetch real data from APIs
-      const [studentsRes, coursesRes, eventsRes, insightsRes, enrollmentsRes] = await Promise.all([
-        api.get('/students').catch(() => ({ data: { data: [] } })),
-        api.get('/courses').catch(() => ({ data: { data: [] } })),
-        api.get('/events').catch(() => ({ data: { data: [] } })),
-        api.get('/insights').catch(() => ({ data: { data: [] } })),
-        api.get('/enrollment/stats').catch(() => ({ data: { totalEnrollments: 0 } }))
+      const [studentsRes, coursesRes, eventsRes, insightsRes] = await Promise.all([
+        api.get('/students').catch(err => {
+          console.error('Students API error:', err.response?.data || err.message);
+          return { data: { data: [] } };
+        }),
+        api.get('/courses').catch(err => {
+          console.error('Courses API error:', err.response?.data || err.message);
+          return { data: { data: [] } };
+        }),
+        api.get('/events').catch(err => {
+          console.error('Events API error:', err.response?.data || err.message);
+          return { data: { data: [] } };
+        }),
+        api.get('/insights').catch(err => {
+          console.error('Insights API error:', err.response?.data || err.message);
+          return { data: { data: [] } };
+        })
       ]);
+
+      console.log('Dashboard data:', {
+        students: studentsRes.data,
+        courses: coursesRes.data,
+        events: eventsRes.data,
+        insights: insightsRes.data
+      });
 
       setStats({
         totalStudents: studentsRes.data.data?.length || 0,
         totalCourses: coursesRes.data.data?.length || 0,
-        activeEnrollments: enrollmentsRes.data.totalEnrollments || 0,
+        activeEnrollments: 0, // Will be calculated from enrollment data
         avgAttendance: 0, // Will be calculated from attendance data
         totalEvents: eventsRes.data.data?.length || 0,
         totalBytelogs: insightsRes.data.data?.length || 0
