@@ -26,7 +26,9 @@ import StudentManagement from './pages/admin/StudentManagement';
 import StudentProgressDashboard from './pages/admin/StudentProgressDashboard';
 import CourseManagement from './pages/admin/CourseManagement';
 import ManageEvents from './pages/admin/ManageEvents';
+import EventsManagement from './pages/admin/EventsManagement';
 import ManageInsights from './pages/admin/ManageInsights';
+import ByteLogManagement from './pages/admin/ByteLogManagement';
 import ManageTestimonials from './pages/admin/ManageTestimonials';
 import ManagePartners from './pages/admin/ManagePartners';
 import PartnersManagement from './pages/admin/PartnersManagement';
@@ -160,14 +162,14 @@ function AppRoutes() {
       <Route path="/admin/events" element={
         <ProtectedRoute>
           <Layout>
-            <ManageEvents />
+            <EventsManagement />
           </Layout>
         </ProtectedRoute>
       } />
       <Route path="/admin/insights" element={
         <ProtectedRoute>
           <Layout>
-            <ManageInsights />
+            <ByteLogManagement />
           </Layout>
         </ProtectedRoute>
       } />
