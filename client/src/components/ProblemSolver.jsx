@@ -181,32 +181,25 @@ const ProblemSolver = ({ problem, onSubmit }) => {
       {/* Left Panel - Problem Description */}
       <div className="w-1/2 border-r border-gray-200 bg-white overflow-y-auto">
         <div className="p-6">
-          {/* Problem Header */}
           <div className="mb-6">
-            <div className="flex items-center justify-between mb-4">
-              <h1 className="text-2xl font-bold text-gray-900">{problem.title}</h1>
-              <button className="p-2 hover:bg-gray-100 rounded">
-                <FaLightbulb className="text-yellow-500" />
-              </button>
-            </div>
-            
+            <h1 className="text-2xl font-bold text-gray-900 mb-4">{problem.title}</h1>
             <div className="flex items-center gap-4 text-sm text-gray-600">
               <span className={`px-3 py-1 rounded-full ${
                 problem.difficulty === 'Easy' ? 'bg-green-100 text-green-700' :
                 problem.difficulty === 'Medium' ? 'bg-yellow-100 text-yellow-700' :
                 'bg-red-100 text-red-700'
               }`}>
-                Difficulty: {problem.difficulty}
+                {problem.difficulty}
               </span>
-              <span>Accuracy: {problem.accuracy}</span>
-              <span>Submissions: {problem.submissions}</span>
-              <span>Points: {problem.points}</span>
+              {problem.accuracy && <span>Accuracy: {problem.accuracy}</span>}
+              {problem.submissions && <span>Submissions: {problem.submissions}</span>}
+              {problem.points && <span>Points: {problem.points}</span>}
             </div>
           </div>
 
           {/* Problem Description */}
           <div className="prose max-w-none">
-            <p className="text-gray-700 mb-6">{problem.description}</p>
+            {problem.description && <p className="text-gray-700 mb-6 whitespace-pre-wrap">{problem.description}</p>}
 
             {/* Tasks */}
             {problem.tasks && (
