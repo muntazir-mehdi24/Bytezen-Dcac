@@ -3856,9 +3856,11 @@ const CourseDetail = () => {
   // Initialize course data and progress
   useEffect(() => {
     loadProgressData();
-
-    // Handle navigation state from problem page
-    if (location.state) {
+  }, [id]);
+  
+  // Handle navigation state from problem page
+  useEffect(() => {
+    if (location.state && course) {
       const { openModule, openLesson, activeFilter } = location.state;
       
       if (openModule) {
@@ -3866,7 +3868,7 @@ const CourseDetail = () => {
       }
       
       if (openLesson) {
-        const module = courseData.modules.find(m => m.id === openModule);
+        const module = course.modules.find(m => m.id === openModule);
         const lesson = module?.lessons.find(l => l.id === openLesson);
         if (lesson) {
           setCurrentLesson(lesson);
@@ -3880,7 +3882,7 @@ const CourseDetail = () => {
         setContentFilter(activeFilter);
       }
     }
-  }, [id, location.state]);
+  }, [location.state, course]);
   
   // Handle article completion (Mark as Read)
   const markArticleAsRead = async () => {
