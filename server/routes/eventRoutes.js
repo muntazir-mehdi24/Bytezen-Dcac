@@ -1,10 +1,22 @@
 import express from 'express';
+import multer from 'multer';
 import Event from '../models/Event.js';
 import { protect, authorize } from '../middleware/auth.js';
-import { fileUpload } from '../middleware/upload.js';
 import { v2 as cloudinary } from 'cloudinary';
 
 const router = express.Router();
+
+// Configure multer for file uploads
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, 'uploads/');
+  },
+  filename: (req, file, cb) => {
+    cb(null, `${Date.now()}-${file.originalname}`);
+  }
+});
+
+const upload = multer({ storage });
 
 // Configure Cloudinary
 cloudinary.config({
@@ -31,7 +43,7 @@ router.get('/', async (req, res, next) => {
 router.post('/', 
   protect, 
   authorize('admin'), 
-  fileUpload.array('images', 10), // Max 10 images
+  upload.array('images', 10), // Max 10 images
   async (req, res, next) => {
     try {
       const { title, description, date } = req.body;
@@ -70,7 +82,7 @@ router.post('/',
 router.put('/:id', 
   protect, 
   authorize('admin'),
-  fileUpload.array('images', 10),
+  upload.array('images', 10),
   async (req, res, next) => {
     try {
       let event = await Event.findById(req.params.id);

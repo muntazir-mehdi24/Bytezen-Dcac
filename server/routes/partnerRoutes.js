@@ -1,15 +1,18 @@
 import express from 'express';
+import multer from 'multer';
 import { protect, authorize } from '../middleware/auth.js';
 import Partner from '../models/Partner.js';
-import { fileUpload } from '../middleware/upload.js';
 import { v2 as cloudinary } from 'cloudinary';
 import { createPartner, createEventSponsor, getPartners } from '../controllers/partnerController.js';
-import multer from 'multer';
-
-// Configure multer for file uploads
-const upload = multer({ dest: 'uploads/' });
 
 const router = express.Router();
+
+// Configure multer
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => cb(null, 'uploads/'),
+  filename: (req, file, cb) => cb(null, `${Date.now()}-${file.originalname}`)
+});
+const upload = multer({ storage });
 
 // Configure Cloudinary
 cloudinary.config({
@@ -91,7 +94,7 @@ router.post(
   '/',
   protect,
   authorize('admin'),
-  fileUpload.single('logo'),
+  upload.single('logo'),
   async (req, res, next) => {
     try {
       const {
@@ -146,7 +149,7 @@ router.put(
   '/:id',
   protect,
   authorize('admin'),
-  fileUpload.single('logo'),
+  upload.single('logo'),
   async (req, res, next) => {
     try {
       const {
@@ -254,7 +257,7 @@ router.get('/types', async (req, res, next) => {
 // @access  Public
 router.post(
   '/apply',
-  fileUpload.single('logo'),
+  upload.single('logo'),
   async (req, res, next) => {
     try {
       const {

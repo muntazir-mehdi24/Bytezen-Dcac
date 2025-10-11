@@ -1,10 +1,17 @@
 import express from 'express';
+import multer from 'multer';
 import { protect, authorize } from '../middleware/auth.js';
 import Insight from '../models/Insight.js';
-import { fileUpload } from '../middleware/upload.js';
 import { v2 as cloudinary } from 'cloudinary';
 
 const router = express.Router();
+
+// Configure multer
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => cb(null, 'uploads/'),
+  filename: (req, file, cb) => cb(null, `${Date.now()}-${file.originalname}`)
+});
+const upload = multer({ storage });
 
 // Configure Cloudinary
 cloudinary.config({
@@ -83,7 +90,7 @@ router.post(
   '/',
   protect,
   authorize('admin'),
-  fileUpload.single('thumbnail'),
+  upload.single('thumbnail'),
   async (req, res, next) => {
     try {
       const { title, content, isPublished, tags } = req.body;
@@ -124,7 +131,7 @@ router.put(
   '/:id',
   protect,
   authorize('admin'),
-  fileUpload.single('thumbnail'),
+  upload.single('thumbnail'),
   async (req, res, next) => {
     try {
       const { title, content, isPublished, tags } = req.body;
