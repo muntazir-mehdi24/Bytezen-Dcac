@@ -81,6 +81,8 @@ attendanceSchema.statics.getCourseStats = async function(courseId) {
     if (!userStats[record.userId]) {
       userStats[record.userId] = {
         userId: record.userId,
+        userName: null, // Will be populated later
+        userEmail: null,
         total: 0,
         present: 0,
         absent: 0,
@@ -97,6 +99,44 @@ attendanceSchema.statics.getCourseStats = async function(courseId) {
       userStats[record.userId].excused++;
     }
   });
+  
+  // Fetch user names from Firebase or MongoDB
+  const userIds = Object.keys(userStats);
+  try {
+    const admin = (await import('firebase-admin')).default;
+    if (admin.apps.length > 0) {
+      const db = admin.firestore();
+      const usersSnapshot = await db.collection('users').get();
+      const usersMap = {};
+      
+      usersSnapshot.docs.forEach(doc => {
+        const data = doc.data();
+        const uid = data.userId || doc.id;
+        usersMap[uid] = {
+          name: data.name || 'Unknown Student',
+          email: data.email || ''
+        };
+      });
+      
+      // Populate user names
+      userIds.forEach(userId => {
+        if (usersMap[userId]) {
+          userStats[userId].userName = usersMap[userId].name;
+          userStats[userId].userEmail = usersMap[userId].email;
+        } else {
+          userStats[userId].userName = userId; // Fallback to ID
+        }
+      });
+    }
+  } catch (error) {
+    console.log('Error fetching user names:', error.message);
+    // Fallback: use userId as name
+    userIds.forEach(userId => {
+      if (!userStats[userId].userName) {
+        userStats[userId].userName = userId;
+      }
+    });
+  }
   
   // Calculate percentages
   Object.keys(userStats).forEach(userId => {

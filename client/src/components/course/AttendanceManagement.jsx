@@ -119,11 +119,19 @@ const AttendanceManagement = ({ courseId }) => {
 
   const exportToCSV = () => {
     // Create CSV content
-    const headers = ['Date', 'Session', 'Type', 'Student', 'Status', 'Duration'];
+    const headers = ['Date', 'Session', 'Type', 'Student Name', 'Student ID', 'Status', 'Duration'];
+    
+    // Create a map of userId to userName from stats
+    const userNameMap = {};
+    stats.forEach(stat => {
+      userNameMap[stat.userId] = stat.userName || stat.userId;
+    });
+    
     const rows = courseAttendance.map(record => [
       new Date(record.sessionDate).toLocaleDateString(),
       record.sessionTitle,
       record.sessionType,
+      userNameMap[record.userId] || record.userId,
       record.userId,
       record.status,
       record.duration
@@ -225,7 +233,7 @@ const AttendanceManagement = ({ courseId }) => {
               <thead className="bg-gray-50">
                 <tr>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Student ID
+                    Student Name
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Total Sessions
@@ -244,8 +252,13 @@ const AttendanceManagement = ({ courseId }) => {
               <tbody className="bg-white divide-y divide-gray-200">
                 {stats.map((stat) => (
                   <tr key={stat.userId} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                      {stat.userId}
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm font-medium text-gray-900">
+                        {stat.userName || stat.userId}
+                      </div>
+                      {stat.userEmail && (
+                        <div className="text-xs text-gray-500">{stat.userEmail}</div>
+                      )}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                       {stat.total}
