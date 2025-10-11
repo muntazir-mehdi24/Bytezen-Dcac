@@ -90,11 +90,19 @@ export const courseAPI = {
 // Progress API
 export const progressAPI = {
   getCourseProgress: (courseId) => api.get(`/progress/${courseId}`),
+  getDetailedProgress: (courseId) => api.get(`/progress/${courseId}/detailed`),
   markLessonComplete: (courseId, lessonId, completed) => 
     api.post(`/progress/${courseId}/lesson`, { lessonId, completed }),
-  markArticleComplete: (courseId, articleId) =>
-    api.post(`/progress/${courseId}/article`, { articleId }),
+  markArticleComplete: (courseId, articleId, timeSpent) =>
+    api.post(`/progress/${courseId}/article`, { articleId, timeSpent }),
+  markProblemComplete: (courseId, problemId, difficulty, points, timeSpent, attempts) =>
+    api.post(`/progress/${courseId}/problem`, { problemId, difficulty, points, timeSpent, attempts }),
+  markQuizComplete: (courseId, quizId, score, totalQuestions, timeSpent) =>
+    api.post(`/progress/${courseId}/quiz`, { quizId, score, totalQuestions, timeSpent }),
   getUserStats: () => api.get('/progress/user/stats'),
+  // Admin endpoints
+  getCourseStudentsProgress: (courseId) => api.get(`/progress/admin/course/${courseId}`),
+  getStudentProgress: (userId, courseId) => api.get(`/progress/admin/student/${userId}/${courseId}`),
 };
 
 // Code Execution API

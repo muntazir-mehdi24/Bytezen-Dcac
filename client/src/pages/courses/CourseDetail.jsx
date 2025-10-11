@@ -7,6 +7,8 @@ import { courseAPI, progressAPI } from '../../services/api';
 import { useAuth } from '../../context/FirebaseAuthContext';
 import AttendanceTab from '../../components/course/AttendanceTab';
 import AttendanceManagement from '../../components/course/AttendanceManagement';
+import ProgressTab from '../../components/course/ProgressTab';
+import StudentProgressDashboard from '../admin/StudentProgressDashboard';
 
 // Sample course data - in a real app, this would come from an API
 const aiMLCourse = {
@@ -3768,7 +3770,7 @@ const CourseDetail = () => {
   const [moduleProgress, setModuleProgress] = useState({});
   const [viewingArticle, setViewingArticle] = useState(null);
   const [currentLesson, setCurrentLesson] = useState(null);
-  const [activeTab, setActiveTab] = useState('chapters'); // chapters, live, leaderboard, noticeboard, attendance
+  const [activeTab, setActiveTab] = useState('chapters'); // chapters, live, leaderboard, noticeboard, attendance, progress
   const [sidebarOpen, setSidebarOpen] = useState(true); // Sidebar toggle state
   const [contentFilter, setContentFilter] = useState('all'); // all, articles, problems, quiz
   
@@ -4569,6 +4571,17 @@ const CourseDetail = () => {
               <FaCalendarCheck className="inline mr-1" />
               ATTENDANCE
             </button>
+            <button
+              onClick={() => setActiveTab('progress')}
+              className={`py-4 px-1 border-b-2 font-medium text-sm ${
+                activeTab === 'progress'
+                  ? 'border-[#2f8d46] text-[#2f8d46]'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              }`}
+            >
+              <FaChartLine className="inline mr-1" />
+              PROGRESS
+            </button>
           </nav>
         </div>
       </div>
@@ -4740,6 +4753,16 @@ const CourseDetail = () => {
                   <AttendanceManagement courseId={id} />
                 ) : (
                   <AttendanceTab courseId={id} />
+                )}
+              </div>
+            )}
+
+            {activeTab === 'progress' && (
+              <div className="bg-white shadow overflow-hidden sm:rounded-lg p-6">
+                {userProfile?.role === 'instructor' || userProfile?.role === 'admin' ? (
+                  <StudentProgressDashboard courseId={id} />
+                ) : (
+                  <ProgressTab courseId={id} />
                 )}
               </div>
             )}
