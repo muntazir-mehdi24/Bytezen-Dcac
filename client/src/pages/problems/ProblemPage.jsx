@@ -674,22 +674,19 @@ const ProblemPage = () => {
   const [problem, setProblem] = useState(null);
 
   useEffect(() => {
-    // Check if problem data is passed via location state
-    if (location.state && location.state.problem) {
-      console.log('Problem data from location state:', location.state.problem);
-      setProblem(location.state.problem);
+    // Always use problemsData for full problem details
+    // location.state.problem only has minimal metadata (id, title, difficulty, points)
+    const problemData = problemsData[problemId];
+    console.log('Problem data from problemsData:', problemData);
+    
+    if (problemData) {
+      setProblem(problemData);
     } else {
-      // Fallback to local problemsData
-      const problemData = problemsData[problemId];
-      console.log('Problem data from local:', problemData);
-      if (problemData) {
-        setProblem(problemData);
-      } else {
-        // Redirect to problems list if not found
-        navigate('/courses');
-      }
+      console.log('Problem not found in problemsData, redirecting...');
+      // Redirect to problems list if not found
+      navigate('/courses');
     }
-  }, [problemId, navigate, location.state]);
+  }, [problemId, navigate]);
 
   const handleSubmit = (result) => {
     console.log('Submission result:', result);
