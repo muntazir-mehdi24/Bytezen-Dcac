@@ -1,6 +1,9 @@
 import express from 'express';
 import multer from 'multer';
 import {
+  createCourse,
+  updateCourse,
+  deleteCourse,
   getAllCourses,
   getCourseContent,
   addWeek,
@@ -10,7 +13,7 @@ import {
   updateContent,
   deleteContent
 } from '../controllers/courseContentController.js';
-import { protect } from '../middleware/auth.js';
+import { protect, authorize } from '../middleware/auth.js';
 
 const router = express.Router();
 
@@ -31,6 +34,11 @@ router.get('/', getAllCourses);
 
 // Protected routes - require authentication
 router.use(protect);
+
+// Course CRUD (Admin only)
+router.post('/', authorize('admin'), createCourse);
+router.put('/:courseId', authorize('admin'), updateCourse);
+router.delete('/:courseId', authorize('admin'), deleteCourse);
 
 // Get course content
 router.get('/:courseId/content', getCourseContent);

@@ -3,6 +3,110 @@ import { uploadToCloudinary } from '../utils/cloudinary.js';
 
 const db = admin.firestore();
 
+// Create a new course
+export const createCourse = async (req, res) => {
+  try {
+    const { title, description, category, difficulty, duration, thumbnail } = req.body;
+    
+    const courseData = {
+      title,
+      description: description || '',
+      category: category || 'General',
+      difficulty: difficulty || 'Beginner',
+      duration: duration || '',
+      thumbnail: thumbnail || '',
+      modules: [],
+      createdAt: admin.firestore.FieldValue.serverTimestamp(),
+      updatedAt: admin.firestore.FieldValue.serverTimestamp()
+    };
+    
+    const docRef = await db.collection('courses').add(courseData);
+    
+    res.status(201).json({
+      success: true,
+      data: { id: docRef.id, ...courseData }
+    });
+  } catch (error) {
+    console.error('Error creating course:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to create course'
+    });
+  }
+};
+
+// Update a course
+export const updateCourse = async (req, res) => {
+  try {
+    const { courseId } = req.params;
+    const { title, description, category, difficulty, duration, thumbnail } = req.body;
+    
+    const docRef = db.collection('courses').doc(courseId);
+    const doc = await docRef.get();
+    
+    if (!doc.exists) {
+      return res.status(404).json({
+        success: false,
+        error: 'Course not found'
+      });
+    }
+    
+    const updateData = {
+      updatedAt: admin.firestore.FieldValue.serverTimestamp()
+    };
+    
+    if (title) updateData.title = title;
+    if (description !== undefined) updateData.description = description;
+    if (category) updateData.category = category;
+    if (difficulty) updateData.difficulty = difficulty;
+    if (duration !== undefined) updateData.duration = duration;
+    if (thumbnail !== undefined) updateData.thumbnail = thumbnail;
+    
+    await docRef.update(updateData);
+    
+    res.json({
+      success: true,
+      data: { id: courseId, ...doc.data(), ...updateData }
+    });
+  } catch (error) {
+    console.error('Error updating course:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to update course'
+    });
+  }
+};
+
+// Delete a course
+export const deleteCourse = async (req, res) => {
+  try {
+    const { courseId } = req.params;
+    
+    const docRef = db.collection('courses').doc(courseId);
+    const doc = await docRef.get();
+    
+    if (!doc.exists) {
+      return res.status(404).json({
+        success: false,
+        error: 'Course not found'
+      });
+    }
+    
+    await docRef.delete();
+    
+    res.json({
+      success: true,
+      message: 'Course deleted successfully'
+    });
+  } catch (error) {
+    console.error('Error deleting course:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to delete course'
+    });
+  }
+};
+
 // Get all courses
 export const getAllCourses = async (req, res) => {
   try {

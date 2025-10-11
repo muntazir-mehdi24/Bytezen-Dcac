@@ -37,6 +37,14 @@ const CourseContentManagement = () => {
 
   const [imageFiles, setImageFiles] = useState([]);
   const [showPreview, setShowPreview] = useState(false);
+  const [showCourseModal, setShowCourseModal] = useState(false);
+  const [courseFormData, setCourseFormData] = useState({
+    title: '',
+    description: '',
+    category: '',
+    difficulty: 'Beginner',
+    duration: ''
+  });
 
   useEffect(() => {
     fetchCourses();
@@ -75,6 +83,31 @@ const CourseContentManagement = () => {
       ...prev,
       [weekId]: !prev[weekId]
     }));
+  };
+
+  // Course Management
+  const handleCreateCourse = () => {
+    setCourseFormData({
+      title: '',
+      description: '',
+      category: '',
+      difficulty: 'Beginner',
+      duration: ''
+    });
+    setShowCourseModal(true);
+  };
+
+  const handleSaveCourse = async (e) => {
+    e.preventDefault();
+    try {
+      await api.post('/courses', courseFormData);
+      toast.success('Course created successfully!');
+      setShowCourseModal(false);
+      fetchCourses();
+    } catch (error) {
+      console.error('Error creating course:', error);
+      toast.error('Failed to create course');
+    }
   };
 
   // Week Management
@@ -229,9 +262,19 @@ const CourseContentManagement = () => {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold text-gray-900">Course Content Management</h1>
-        <p className="text-gray-600 mt-1">Manage course weeks, articles, problems, and quizzes</p>
+      <div className="mb-6 flex justify-between items-center">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">Course Content Management</h1>
+          <p className="text-gray-600 mt-1">Manage course weeks, articles, problems, and quizzes</p>
+        </div>
+        {!selectedCourse && (
+          <button
+            onClick={handleCreateCourse}
+            className="flex items-center gap-2 bg-[#2f8d46] text-white px-6 py-3 rounded-lg hover:bg-[#267a3a] transition-colors"
+          >
+            <FaPlus /> Create New Course
+          </button>
+        )}
       </div>
 
       {!selectedCourse ? (
@@ -644,6 +687,94 @@ const CourseContentManagement = () => {
                   </button>
                 </div>
               )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Course Creation Modal */}
+      {showCourseModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6">
+              <h2 className="text-2xl font-bold mb-4">Create New Course</h2>
+              <form onSubmit={handleSaveCourse} className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium mb-1">Course Title *</label>
+                  <input
+                    type="text"
+                    value={courseFormData.title}
+                    onChange={(e) => setCourseFormData({ ...courseFormData, title: e.target.value })}
+                    required
+                    className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-[#2f8d46]"
+                    placeholder="e.g., Web Development Fundamentals"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium mb-1">Description</label>
+                  <textarea
+                    value={courseFormData.description}
+                    onChange={(e) => setCourseFormData({ ...courseFormData, description: e.target.value })}
+                    rows="4"
+                    className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-[#2f8d46]"
+                    placeholder="Brief description of the course..."
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Category</label>
+                    <input
+                      type="text"
+                      value={courseFormData.category}
+                      onChange={(e) => setCourseFormData({ ...courseFormData, category: e.target.value })}
+                      className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-[#2f8d46]"
+                      placeholder="e.g., Web Development"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Difficulty</label>
+                    <select
+                      value={courseFormData.difficulty}
+                      onChange={(e) => setCourseFormData({ ...courseFormData, difficulty: e.target.value })}
+                      className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-[#2f8d46]"
+                    >
+                      <option value="Beginner">Beginner</option>
+                      <option value="Intermediate">Intermediate</option>
+                      <option value="Advanced">Advanced</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium mb-1">Duration</label>
+                  <input
+                    type="text"
+                    value={courseFormData.duration}
+                    onChange={(e) => setCourseFormData({ ...courseFormData, duration: e.target.value })}
+                    className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-[#2f8d46]"
+                    placeholder="e.g., 8 weeks, 40 hours"
+                  />
+                </div>
+
+                <div className="flex justify-end gap-3 pt-4 border-t">
+                  <button
+                    type="button"
+                    onClick={() => setShowCourseModal(false)}
+                    className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-4 py-2 bg-[#2f8d46] text-white rounded-lg hover:bg-[#267a3a]"
+                  >
+                    Create Course
+                  </button>
+                </div>
+              </form>
             </div>
           </div>
         </div>
