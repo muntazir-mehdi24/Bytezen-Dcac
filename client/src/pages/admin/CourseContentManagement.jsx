@@ -59,8 +59,11 @@ const CourseContentManagement = () => {
   const fetchCourseContent = async (courseId) => {
     try {
       const response = await api.get(`/courses/${courseId}/content`);
-      const course = courses.find(c => c._id === courseId);
-      setSelectedCourse({ ...course, weeks: response.data.data || [] });
+      const courseData = response.data.data;
+      setSelectedCourse({
+        ...courseData,
+        weeks: courseData.modules || [] // Firebase uses 'modules' instead of 'weeks'
+      });
     } catch (error) {
       console.error('Error fetching course content:', error);
       toast.error('Failed to load course content');
@@ -101,14 +104,14 @@ const CourseContentManagement = () => {
     e.preventDefault();
     try {
       if (editingWeek) {
-        await api.put(`/courses/${selectedCourse._id}/weeks/${editingWeek._id}`, weekFormData);
+        await api.put(`/courses/${selectedCourse.id}/weeks/${editingWeek.id}`, weekFormData);
         toast.success('Week updated successfully!');
       } else {
-        await api.post(`/courses/${selectedCourse._id}/weeks`, weekFormData);
+        await api.post(`/courses/${selectedCourse.id}/weeks`, weekFormData);
         toast.success('Week added successfully!');
       }
       setShowWeekModal(false);
-      fetchCourseContent(selectedCourse._id);
+      fetchCourseContent(selectedCourse.id);
     } catch (error) {
       console.error('Error saving week:', error);
       toast.error('Failed to save week');
@@ -119,9 +122,9 @@ const CourseContentManagement = () => {
     if (!window.confirm('Are you sure? This will delete all content in this week.')) return;
     
     try {
-      await api.delete(`/courses/${selectedCourse._id}/weeks/${weekId}`);
+      await api.delete(`/courses/${selectedCourse.id}/weeks/${weekId}`);
       toast.success('Week deleted successfully!');
-      fetchCourseContent(selectedCourse._id);
+      fetchCourseContent(selectedCourse.id);
     } catch (error) {
       console.error('Error deleting week:', error);
       toast.error('Failed to delete week');
@@ -180,14 +183,14 @@ const CourseContentManagement = () => {
 
       if (editingContent) {
         await api.put(
-          `/courses/${selectedCourse._id}/weeks/${selectedWeek._id}/content/${editingContent._id}`,
+          `/courses/${selectedCourse.id}/weeks/${selectedWeek.id}/content/${editingContent.id}`,
           formData,
           { headers: { 'Content-Type': 'multipart/form-data' } }
         );
         toast.success('Content updated successfully!');
       } else {
         await api.post(
-          `/courses/${selectedCourse._id}/weeks/${selectedWeek._id}/content`,
+          `/courses/${selectedCourse.id}/weeks/${selectedWeek.id}/content`,
           formData,
           { headers: { 'Content-Type': 'multipart/form-data' } }
         );
@@ -196,7 +199,7 @@ const CourseContentManagement = () => {
 
       setShowContentModal(false);
       setImageFiles([]);
-      fetchCourseContent(selectedCourse._id);
+      fetchCourseContent(selectedCourse.id);
     } catch (error) {
       console.error('Error saving content:', error);
       toast.error('Failed to save content');
@@ -207,9 +210,9 @@ const CourseContentManagement = () => {
     if (!window.confirm('Are you sure you want to delete this content?')) return;
     
     try {
-      await api.delete(`/courses/${selectedCourse._id}/weeks/${weekId}/content/${contentId}`);
+      await api.delete(`/courses/${selectedCourse.id}/weeks/${weekId}/content/${contentId}`);
       toast.success('Content deleted successfully!');
-      fetchCourseContent(selectedCourse._id);
+      fetchCourseContent(selectedCourse.id);
     } catch (error) {
       console.error('Error deleting content:', error);
       toast.error('Failed to delete content');
@@ -236,8 +239,8 @@ const CourseContentManagement = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {courses.map((course) => (
             <div
-              key={course._id}
-              onClick={() => fetchCourseContent(course._id)}
+              key={course.id}
+              onClick={() => fetchCourseContent(course.id)}
               className="bg-white border-2 border-gray-200 rounded-lg p-6 hover:shadow-lg transition-all cursor-pointer hover:border-[#2f8d46]"
             >
               <div className="flex items-center gap-3 mb-3">
@@ -285,16 +288,16 @@ const CourseContentManagement = () => {
           {/* Weeks List */}
           <div className="space-y-4">
             {selectedCourse.weeks?.map((week) => (
-              <div key={week._id} className="bg-white rounded-lg shadow-lg overflow-hidden">
+              <div key={week.id} className="bg-white rounded-lg shadow-lg overflow-hidden">
                 {/* Week Header */}
                 <div className="bg-gradient-to-r from-[#2f8d46] to-[#1e6b32] text-white p-4">
                   <div className="flex justify-between items-center">
                     <div className="flex items-center gap-3 flex-1">
                       <button
-                        onClick={() => toggleWeek(week._id)}
+                        onClick={() => toggleWeek(week.id)}
                         className="text-white hover:bg-white/20 p-2 rounded"
                       >
-                        {expandedWeeks[week._id] ? <FaChevronDown /> : <FaChevronRight />}
+                        {expandedWeeks[week.id] ? <FaChevronDown /> : <FaChevronRight />}
                       </button>
                       <div>
                         <h3 className="text-lg font-bold">{week.title}</h3>
@@ -309,7 +312,7 @@ const CourseContentManagement = () => {
                         <FaEdit />
                       </button>
                       <button
-                        onClick={() => handleDeleteWeek(week._id)}
+                        onClick={() => handleDeleteWeek(week.id)}
                         className="p-2 hover:bg-white/20 rounded"
                       >
                         <FaTrash />
@@ -319,7 +322,7 @@ const CourseContentManagement = () => {
                 </div>
 
                 {/* Week Content */}
-                {expandedWeeks[week._id] && (
+                {expandedWeeks[week.id] && (
                   <div className="p-6">
                     {/* Add Content Buttons */}
                     <div className="flex gap-3 mb-6">
@@ -347,7 +350,7 @@ const CourseContentManagement = () => {
                     <div className="space-y-3">
                       {week.lessons?.map((lesson) => (
                         <div
-                          key={lesson._id}
+                          key={lesson.id}
                           className="border-2 border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow"
                         >
                           <div className="flex justify-between items-start">
@@ -384,7 +387,7 @@ const CourseContentManagement = () => {
                                 <FaEdit />
                               </button>
                               <button
-                                onClick={() => handleDeleteContent(week._id, lesson._id)}
+                                onClick={() => handleDeleteContent(week.id, lesson.id)}
                                 className="p-2 text-red-600 hover:bg-red-50 rounded"
                               >
                                 <FaTrash />
