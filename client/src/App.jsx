@@ -22,6 +22,7 @@ import QuizPage from './pages/quiz/QuizPage';
 import CAMS from './pages/CAMS';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import EnrollmentManagement from './pages/admin/EnrollmentManagement';
+import StudentManagement from './pages/admin/StudentManagement';
 import StudentProgressDashboard from './pages/admin/StudentProgressDashboard';
 import ManageEvents from './pages/admin/ManageEvents';
 import ManageInsights from './pages/admin/ManageInsights';
@@ -123,6 +124,13 @@ function AppRoutes() {
         <ProtectedRoute>
           <Layout>
             <EnrollmentManagement />
+          </Layout>
+        </ProtectedRoute>
+      } />
+      <Route path="/admin/students" element={
+        <ProtectedRoute>
+          <Layout>
+            <StudentManagement />
           </Layout>
         </ProtectedRoute>
       } />

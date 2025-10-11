@@ -56,10 +56,10 @@ const AdminDashboard = () => {
   const adminModules = [
     {
       title: 'Student Management',
-      description: 'View and manage student enrollments, profiles, and divisions',
+      description: 'Add, edit, delete students, manage departments and divisions',
       icon: FaUserGraduate,
       color: 'blue',
-      link: '/admin/enrollment',
+      link: '/admin/students',
       stats: `${stats.totalStudents} Students`
     },
     {
