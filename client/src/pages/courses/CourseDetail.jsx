@@ -3776,31 +3776,86 @@ const CourseDetail = () => {
   const [showTickAnimation, setShowTickAnimation] = useState(false);
   const [completionMessage, setCompletionMessage] = useState('');
   
+  // Load progress from backend and merge with course data
+  const loadProgressData = async () => {
+    try {
+      const response = await progressAPI.getCourseProgress(id);
+      const progressData = response.data.data;
+      
+      // Get base course data
+      const courseData = JSON.parse(JSON.stringify(coursesData[id] || coursesData[1]));
+      
+      // Merge progress data with course structure
+      if (progressData) {
+        // Mark completed articles
+        progressData.completedArticles?.forEach(completedArticle => {
+          courseData.modules.forEach(module => {
+            module.lessons.forEach(lesson => {
+              if (lesson.articles) {
+                lesson.articles.forEach(article => {
+                  if (article.id === completedArticle.articleId) {
+                    article.completed = true;
+                  }
+                });
+              }
+            });
+          });
+        });
+        
+        // Mark completed problems
+        progressData.completedProblems?.forEach(completedProblem => {
+          courseData.modules.forEach(module => {
+            module.lessons.forEach(lesson => {
+              if (lesson.problems) {
+                lesson.problems.forEach(problem => {
+                  if (problem.id === completedProblem.problemId) {
+                    problem.completed = true;
+                  }
+                });
+              }
+            });
+          });
+        });
+        
+        // Mark completed quizzes
+        progressData.completedQuizzes?.forEach(completedQuiz => {
+          courseData.modules.forEach(module => {
+            module.lessons.forEach(lesson => {
+              if (lesson.quiz) {
+                lesson.quiz.forEach(quiz => {
+                  if (quiz.id === completedQuiz.quizId) {
+                    quiz.completed = true;
+                  }
+                });
+              }
+            });
+          });
+        });
+        
+        // Mark completed lessons
+        progressData.completedLessons?.forEach(completedLesson => {
+          courseData.modules.forEach(module => {
+            module.lessons.forEach(lesson => {
+              if (lesson.id === completedLesson.lessonId) {
+                lesson.completed = true;
+              }
+            });
+          });
+        });
+      }
+      
+      setCourse(courseData);
+    } catch (error) {
+      console.error('Error loading progress:', error);
+      // Fallback to course data without progress
+      const courseData = coursesData[id] || coursesData[1];
+      setCourse(courseData);
+    }
+  };
+
   // Initialize course data and progress
   useEffect(() => {
-    const courseData = coursesData[id] || coursesData[1];
-
-    // Calculate progress for each module
-    const calculatedModuleProgress = {};
-    courseData.modules.forEach(module => {
-      const totalItems = module.lessons.length;
-      const completedItems = module.lessons.filter(lesson => lesson.completed).length;
-      calculatedModuleProgress[module.id] = totalItems > 0 
-        ? Math.round((completedItems / totalItems) * 100) 
-        : 0;
-    });
-    
-    // Calculate overall course progress
-    const allLessons = courseData.modules.flatMap(m => m.lessons);
-    const totalLessons = allLessons.length;
-    const completedLessons = allLessons.filter(l => l.completed).length;
-    const overallProgress = totalLessons > 0 
-      ? Math.round((completedLessons / totalLessons) * 100) 
-      : 0;
-    
-    setCourse(courseData);
-    setModuleProgress(calculatedModuleProgress);
-    setProgress(overallProgress);
+    loadProgressData();
 
     // Handle navigation state from problem page
     if (location.state) {
@@ -3827,7 +3882,61 @@ const CourseDetail = () => {
     }
   }, [id, location.state]);
   
-  // Handle lesson completion toggle
+  // Handle article completion (Mark as Read)
+  const markArticleAsRead = async () => {
+    if (!enrolled || !currentLesson || !viewingArticle) return;
+    
+    try {
+      // Find the current article
+      const currentArticle = currentLesson.articles?.find(a => a.content === viewingArticle);
+      
+      if (!currentArticle) return;
+      
+      // Check if already completed
+      if (currentArticle.completed) {
+        setCompletionMessage('✓ Already marked as complete!');
+        setTimeout(() => setCompletionMessage(''), 2000);
+        return;
+      }
+      
+      // Update backend - mark article as complete
+      await progressAPI.markArticleComplete(id, currentArticle.id, 0); // timeSpent can be tracked later
+      
+      // Update local state
+      setCourse(prevCourse => {
+        const updatedModules = prevCourse.modules.map(module => {
+          const updatedLessons = module.lessons.map(lesson => {
+            if (lesson.id === currentLesson.id && lesson.articles) {
+              const updatedArticles = lesson.articles.map(article => {
+                if (article.id === currentArticle.id) {
+                  return { ...article, completed: true };
+                }
+                return article;
+              });
+              return { ...lesson, articles: updatedArticles };
+            }
+            return lesson;
+          });
+          return { ...module, lessons: updatedLessons };
+        });
+        return { ...prevCourse, modules: updatedModules };
+      });
+      
+      // Show tick animation
+      setShowTickAnimation(true);
+      setCompletionMessage('✓ Marked as complete!');
+      setTimeout(() => {
+        setShowTickAnimation(false);
+        setCompletionMessage('');
+      }, 2000);
+    } catch (error) {
+      console.error('Error marking article as complete:', error);
+      setCompletionMessage('❌ Failed to update progress');
+      setTimeout(() => setCompletionMessage(''), 2000);
+    }
+  };
+  
+  // Handle lesson completion toggle (for non-article lessons)
   const toggleLessonCompletion = async (moduleId, lessonId) => {
     if (!enrolled) return;
     
@@ -4508,17 +4617,12 @@ const CourseDetail = () => {
 
                 {/* Mark as Read Button */}
                 <button
-                  onClick={() => {
-                    const moduleId = currentModule?.id;
-                    if (moduleId && currentLesson) {
-                      toggleLessonCompletion(moduleId, currentLesson.id);
-                    }
-                  }}
+                  onClick={markArticleAsRead}
                   className={`px-8 py-3 bg-[#2f8d46] text-white rounded-lg font-semibold hover:bg-[#267a3a] transition-all shadow-sm ${
                     showTickAnimation ? 'scale-110' : ''
                   }`}
                 >
-                  {currentLesson?.completed ? '✓ Completed' : 'Mark as Read'}
+                  {currentLesson?.articles?.find(a => a.content === viewingArticle)?.completed ? '✓ Completed' : 'Mark as Read'}
                 </button>
 
                 {/* Next Article Button */}

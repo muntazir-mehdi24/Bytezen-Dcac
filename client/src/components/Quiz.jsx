@@ -7,7 +7,17 @@ const Quiz = ({ quiz, onComplete }) => {
   const [showExplanation, setShowExplanation] = useState({});
   const [quizCompleted, setQuizCompleted] = useState(false);
 
-  const question = quiz.questions[currentQuestion];
+  const question = quiz?.questions?.[currentQuestion];
+
+  if (!quiz || !quiz.questions || quiz.questions.length === 0) {
+    return (
+      <div className="max-w-4xl mx-auto p-6">
+        <div className="bg-white rounded-lg shadow-lg p-8 text-center">
+          <p className="text-gray-600">No quiz questions available.</p>
+        </div>
+      </div>
+    );
+  }
 
   const handleAnswerSelect = (questionIndex, optionIndex) => {
     setAnswers({
@@ -64,7 +74,7 @@ const Quiz = ({ quiz, onComplete }) => {
   };
 
   const isAnswered = answers[currentQuestion] !== undefined;
-  const isCorrect = answers[currentQuestion] === question.correctAnswer;
+  const isCorrect = question && answers[currentQuestion] === question.correctAnswer;
 
   const correctCount = quiz.questions.filter((q, i) => answers[i] === q.correctAnswer).length;
   const wrongCount = Object.keys(answers).length - correctCount;
