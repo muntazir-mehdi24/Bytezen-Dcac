@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { FaArrowLeft } from 'react-icons/fa';
 import ProblemSolver from '../../components/ProblemSolver';
+import { progressAPI } from '../../services/api';
 
 // Sample problem data
 const problemsData = {
@@ -688,9 +689,23 @@ const ProblemPage = () => {
     }
   }, [problemId, navigate]);
 
-  const handleSubmit = (result) => {
+  const handleSubmit = async (result) => {
     console.log('Submission result:', result);
-    // Handle submission - update progress, save to database, etc.
+    
+    // If submission was successful, update progress
+    if (result.success && location.state?.fromCourse) {
+      try {
+        await progressAPI.markProblemComplete(
+          location.state.fromCourse,
+          problemId,
+          result.timeTaken,
+          problem.points || 0
+        );
+        console.log('Progress updated successfully');
+      } catch (error) {
+        console.error('Error updating progress:', error);
+      }
+    }
   };
 
   const handleBack = () => {

@@ -6,7 +6,11 @@ import { codeAPI } from '../services/api';
 const ProblemSolver = ({ problem, onSubmit }) => {
   console.log('ProblemSolver received problem:', problem);
   
-  const [code, setCode] = useState(problem?.starterCode || '');
+  // Check if there's a stored solution, otherwise use starter code
+  const storedSolution = problem?.id ? localStorage.getItem(`solution_${problem.id}`) : null;
+  const initialCode = storedSolution || problem?.starterCode || '';
+  
+  const [code, setCode] = useState(initialCode);
   const [language, setLanguage] = useState('python');
   const [output, setOutput] = useState('');
   const [isCompiling, setIsCompiling] = useState(false);
@@ -21,6 +25,7 @@ const ProblemSolver = ({ problem, onSubmit }) => {
   const [executionTime, setExecutionTime] = useState(null);
   const [timerRunning, setTimerRunning] = useState(false);
   const [elapsedTime, setElapsedTime] = useState(0);
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   
   if (!problem) {
     return (
@@ -171,6 +176,16 @@ const ProblemSolver = ({ problem, onSubmit }) => {
       
       setSubmissionResult(testResults);
       
+      // If all tests passed, store the solution and show success message
+      if (allPassed) {
+        // Store current code as the solution (user's successful submission)
+        localStorage.setItem(`solution_${problem.id}`, code);
+        
+        // Show success celebration
+        setShowSuccessMessage(true);
+        setTimeout(() => setShowSuccessMessage(false), 5000);
+      }
+      
       if (onSubmit) {
         onSubmit(testResults);
       }
@@ -187,7 +202,20 @@ const ProblemSolver = ({ problem, onSubmit }) => {
   };
 
   return (
-    <div className="flex h-screen bg-gray-50">
+    <div className="flex h-screen bg-gray-50 relative">
+      {/* Success Celebration Message */}
+      {showSuccessMessage && (
+        <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 animate-bounce">
+          <div className="bg-green-500 text-white px-8 py-4 rounded-lg shadow-2xl flex items-center gap-3">
+            <FaCheckCircle className="text-3xl" />
+            <div>
+              <p className="text-xl font-bold">🎉 Congratulations!</p>
+              <p className="text-sm">All test cases passed! +{problem.points || 0} points</p>
+            </div>
+          </div>
+        </div>
+      )}
+      
       {/* Left Panel - Problem Description */}
       <div className="w-1/2 border-r border-gray-200 bg-white overflow-y-auto">
         <div className="p-6">
