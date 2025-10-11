@@ -676,10 +676,12 @@ const ProblemPage = () => {
   useEffect(() => {
     // Check if problem data is passed via location state
     if (location.state && location.state.problem) {
+      console.log('Problem data from location state:', location.state.problem);
       setProblem(location.state.problem);
     } else {
       // Fallback to local problemsData
       const problemData = problemsData[problemId];
+      console.log('Problem data from local:', problemData);
       if (problemData) {
         setProblem(problemData);
       } else {

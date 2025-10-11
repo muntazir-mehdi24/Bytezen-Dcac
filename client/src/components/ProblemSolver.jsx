@@ -4,7 +4,9 @@ import { FaPlay, FaCheckCircle, FaClock, FaLightbulb, FaTimes } from 'react-icon
 import { codeAPI } from '../services/api';
 
 const ProblemSolver = ({ problem, onSubmit }) => {
-  const [code, setCode] = useState(problem.starterCode || '');
+  console.log('ProblemSolver received problem:', problem);
+  
+  const [code, setCode] = useState(problem?.starterCode || '');
   const [language, setLanguage] = useState('python');
   const [output, setOutput] = useState('');
   const [isCompiling, setIsCompiling] = useState(false);
@@ -19,6 +21,14 @@ const ProblemSolver = ({ problem, onSubmit }) => {
   const [executionTime, setExecutionTime] = useState(null);
   const [timerRunning, setTimerRunning] = useState(false);
   const [elapsedTime, setElapsedTime] = useState(0);
+  
+  if (!problem) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <p className="text-gray-600">No problem data available</p>
+      </div>
+    );
+  }
 
   // Timer effect
   useEffect(() => {
