@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import { toast } from 'react-toastify';
+import api from '../../services/api';
 
 const ManageTestimonials = () => {
   const [testimonials, setTestimonials] = useState([]);
@@ -23,15 +23,13 @@ const ManageTestimonials = () => {
 
   const fetchTestimonials = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/testimonials');
+      const response = await api.get('/testimonials');
       if (response.data.success) {
         setTestimonials(response.data.data);
       }
     } catch (error) {
       console.error('Error fetching testimonials:', error);
       toast.error('Failed to fetch testimonials');
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -39,10 +37,10 @@ const ManageTestimonials = () => {
     e.preventDefault();
     try {
       if (editingId) {
-        await axios.put(`http://localhost:5000/api/testimonials/${editingId}`, formData);
+        await api.put(`/testimonials/${editingId}`, formData);
         toast.success('Testimonial updated successfully!');
       } else {
-        await axios.post('http://localhost:5000/api/testimonials', formData);
+        await api.post('/testimonials', formData);
         toast.success('Testimonial created successfully!');
       }
       resetForm();
@@ -70,7 +68,7 @@ const ManageTestimonials = () => {
   const handleDelete = async (id) => {
     if (window.confirm('Are you sure you want to delete this testimonial?')) {
       try {
-        await axios.delete(`http://localhost:5000/api/testimonials/${id}`);
+        await api.delete(`/testimonials/${id}`);
         toast.success('Testimonial deleted successfully!');
         fetchTestimonials();
       } catch (error) {
@@ -82,7 +80,7 @@ const ManageTestimonials = () => {
 
   const handleToggleStatus = async (id) => {
     try {
-      await axios.patch(`http://localhost:5000/api/testimonials/${id}/toggle`);
+      await api.patch(`/testimonials/${id}/toggle`);
       toast.success('Status updated successfully!');
       fetchTestimonials();
     } catch (error) {
