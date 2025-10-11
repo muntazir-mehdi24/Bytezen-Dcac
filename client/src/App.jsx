@@ -29,7 +29,8 @@ import ManageEvents from './pages/admin/ManageEvents';
 import ManageInsights from './pages/admin/ManageInsights';
 import ManageTestimonials from './pages/admin/ManageTestimonials';
 import ManagePartners from './pages/admin/ManagePartners';
-import ManageCouncil from './pages/admin/ManageCouncil';
+import PartnersManagement from './pages/admin/PartnersManagement';
+import CouncilManagement from './pages/admin/CouncilManagement';
 
 // Main App Component with AuthProvider
 function App() {
@@ -180,14 +181,14 @@ function AppRoutes() {
       <Route path="/admin/partners" element={
         <ProtectedRoute>
           <Layout>
-            <ManagePartners />
+            <PartnersManagement />
           </Layout>
         </ProtectedRoute>
       } />
       <Route path="/admin/council" element={
         <ProtectedRoute>
           <Layout>
-            <ManageCouncil />
+            <CouncilManagement />
           </Layout>
         </ProtectedRoute>
       } />
