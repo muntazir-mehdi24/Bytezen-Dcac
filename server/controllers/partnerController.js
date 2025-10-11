@@ -1,15 +1,13 @@
 import Partner from '../models/Partner.js';
-import { uploadFile } from '../middleware/upload.js';
 
 export const createPartner = async (req, res) => {
   try {
     const { name, contactName, contactEmail, websiteUrl, description, partnershipType } = req.body;
     
-    // Handle file upload if exists
+    // Logo URL will be handled by the route middleware (Cloudinary)
     let logoUrl = '';
     if (req.file) {
-      const result = await uploadFile(req.file);
-      logoUrl = result.secure_url;
+      logoUrl = req.file.path; // Cloudinary URL from route middleware
     }
 
     const partner = new Partner({
