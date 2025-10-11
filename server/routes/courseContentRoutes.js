@@ -10,7 +10,7 @@ import {
   updateContent,
   deleteContent
 } from '../controllers/courseContentController.js';
-import { verifyToken } from '../middleware/auth.js';
+import { protect } from '../middleware/auth.js';
 
 const router = express.Router();
 
@@ -30,7 +30,7 @@ const upload = multer({ storage });
 router.get('/', getAllCourses);
 
 // Protected routes - require authentication
-router.use(verifyToken);
+router.use(protect);
 
 // Get course content
 router.get('/:courseId/content', getCourseContent);

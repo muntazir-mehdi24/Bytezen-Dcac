@@ -6,12 +6,12 @@ import {
   deleteStudent,
   getStudentById
 } from '../controllers/studentController.js';
-import { verifyToken } from '../middleware/auth.js';
+import { protect } from '../middleware/auth.js';
 
 const router = express.Router();
 
 // All routes require authentication
-router.use(verifyToken);
+router.use(protect);
 
 // Get all students
 router.get('/', getAllStudents);
