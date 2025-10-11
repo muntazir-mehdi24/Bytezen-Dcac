@@ -1,8 +1,10 @@
 import express from 'express';
 import multer from 'multer';
-import Event from '../models/Event.js';
+import admin from 'firebase-admin';
 import { protect, authorize } from '../middleware/auth.js';
 import { v2 as cloudinary } from 'cloudinary';
+
+const db = admin.firestore();
 
 const router = express.Router();
 
@@ -28,13 +30,19 @@ cloudinary.config({
 // Get all events - Public access
 router.get('/', async (req, res, next) => {
   try {
-    const events = await Event.find().sort('-date');
+    const eventsSnapshot = await db.collection('events').orderBy('date', 'desc').get();
+    const events = [];
+    eventsSnapshot.forEach(doc => {
+      events.push({ id: doc.id, ...doc.data() });
+    });
+    
     res.status(200).json({
       success: true,
       count: events.length,
       data: events
     });
   } catch (err) {
+    console.error('Error fetching events:', err);
     next(err);
   }
 });
@@ -69,24 +77,28 @@ router.post('/',
         imageUrl = result.secure_url;
       }
 
-      const event = await Event.create({
+      const eventData = {
         title,
         description,
-        date,
+        date: new Date(date),
         time,
         location,
         eventType,
         mode,
         registrationLink,
-        maxParticipants: maxParticipants ? parseInt(maxParticipants) : undefined,
+        maxParticipants: maxParticipants ? parseInt(maxParticipants) : null,
         isPublished: isPublished === 'true' || isPublished === true,
         images: imageUrl ? [imageUrl] : [],
-        createdBy: req.user._id || req.user.id
-      });
+        createdBy: req.user.uid || req.user._id || req.user.id,
+        createdAt: admin.firestore.FieldValue.serverTimestamp(),
+        updatedAt: admin.firestore.FieldValue.serverTimestamp()
+      };
+
+      const docRef = await db.collection('events').add(eventData);
 
       res.status(201).json({
         success: true,
-        data: event
+        data: { id: docRef.id, ...eventData }
       });
     } catch (err) {
       console.error('Error creating event:', err);
@@ -102,9 +114,10 @@ router.put('/:id',
   upload.single('image'),
   async (req, res, next) => {
     try {
-      let event = await Event.findById(req.params.id);
+      const docRef = db.collection('events').doc(req.params.id);
+      const doc = await docRef.get();
 
-      if (!event) {
+      if (!doc.exists) {
         return res.status(404).json({
           success: false,
           error: 'Event not found'
@@ -124,8 +137,10 @@ router.put('/:id',
         isPublished 
       } = req.body;
 
+      const eventData = doc.data();
+      
       // Upload new image to Cloudinary if provided
-      let imageUrl = event.images && event.images.length > 0 ? event.images[0] : '';
+      let imageUrl = eventData.images && eventData.images.length > 0 ? eventData.images[0] : '';
       if (req.file) {
         const result = await cloudinary.uploader.upload(req.file.path, {
           folder: 'bytezen/events',
@@ -135,27 +150,26 @@ router.put('/:id',
       }
 
       // Update event data
-      event = await Event.findByIdAndUpdate(
-        req.params.id,
-        { 
-          title, 
-          description, 
-          date, 
-          time, 
-          location, 
-          eventType, 
-          mode, 
-          registrationLink, 
-          maxParticipants: maxParticipants ? parseInt(maxParticipants) : undefined,
-          isPublished: isPublished === 'true' || isPublished === true,
-          images: imageUrl ? [imageUrl] : []
-        },
-        { new: true, runValidators: true }
-      );
+      const updateData = {
+        title, 
+        description, 
+        date: new Date(date), 
+        time, 
+        location, 
+        eventType, 
+        mode, 
+        registrationLink, 
+        maxParticipants: maxParticipants ? parseInt(maxParticipants) : null,
+        isPublished: isPublished === 'true' || isPublished === true,
+        images: imageUrl ? [imageUrl] : [],
+        updatedAt: admin.firestore.FieldValue.serverTimestamp()
+      };
+
+      await docRef.update(updateData);
 
       res.status(200).json({
         success: true,
-        data: event
+        data: { id: req.params.id, ...updateData }
       });
     } catch (err) {
       console.error('Error updating event:', err);
@@ -170,24 +184,31 @@ router.delete('/:id',
   authorize('admin'), 
   async (req, res, next) => {
     try {
-      const event = await Event.findById(req.params.id);
+      const docRef = db.collection('events').doc(req.params.id);
+      const doc = await docRef.get();
 
-      if (!event) {
+      if (!doc.exists) {
         return res.status(404).json({
           success: false,
           error: 'Event not found'
         });
       }
 
+      const eventData = doc.data();
+      
       // Delete images from Cloudinary
-      if (event.images && event.images.length > 0) {
-        for (const imageUrl of event.images) {
-          const publicId = imageUrl.split('/').pop().split('.')[0];
-          await cloudinary.uploader.destroy(`bytezen/events/${publicId}`);
+      if (eventData.images && eventData.images.length > 0) {
+        for (const imageUrl of eventData.images) {
+          try {
+            const publicId = imageUrl.split('/').pop().split('.')[0];
+            await cloudinary.uploader.destroy(`bytezen/events/${publicId}`);
+          } catch (err) {
+            console.error('Error deleting image:', err);
+          }
         }
       }
 
-      await Event.findByIdAndDelete(req.params.id);
+      await docRef.delete();
 
       res.status(200).json({
         success: true,
@@ -205,21 +226,25 @@ router.patch('/:id/toggle',
   authorize('admin'), 
   async (req, res, next) => {
     try {
-      const event = await Event.findById(req.params.id);
+      const docRef = db.collection('events').doc(req.params.id);
+      const doc = await docRef.get();
 
-      if (!event) {
+      if (!doc.exists) {
         return res.status(404).json({
           success: false,
           error: 'Event not found'
         });
       }
 
-      event.isPublished = !event.isPublished;
-      await event.save();
+      const eventData = doc.data();
+      await docRef.update({
+        isPublished: !eventData.isPublished,
+        updatedAt: admin.firestore.FieldValue.serverTimestamp()
+      });
 
       res.status(200).json({
         success: true,
-        data: event
+        data: { id: req.params.id, ...eventData, isPublished: !eventData.isPublished }
       });
     } catch (err) {
       next(err);
@@ -230,9 +255,9 @@ router.patch('/:id/toggle',
 // Get single event - Public access
 router.get('/:id', async (req, res, next) => {
   try {
-    const event = await Event.findById(req.params.id);
+    const doc = await db.collection('events').doc(req.params.id).get();
 
-    if (!event) {
+    if (!doc.exists) {
       return res.status(404).json({
         success: false,
         error: 'Event not found'
@@ -241,7 +266,7 @@ router.get('/:id', async (req, res, next) => {
 
     res.status(200).json({
       success: true,
-      data: event
+      data: { id: doc.id, ...doc.data() }
     });
   } catch (err) {
     next(err);
