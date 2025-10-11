@@ -93,7 +93,7 @@ router.post(
   upload.single('thumbnail'),
   async (req, res, next) => {
     try {
-      const { title, content, isPublished, tags } = req.body;
+      const { title, content, author, isPublished, tags } = req.body;
       
       let thumbnailUrl = '';
       
@@ -108,10 +108,11 @@ router.post(
       const insight = await Insight.create({
         title,
         content,
-        author: req.user.id,
+        author: author || req.user.name || 'Admin',
+        authorId: req.user._id || req.user.id,
         thumbnailUrl,
-        isPublished: isPublished === 'true',
-        tags: tags ? JSON.parse(tags) : []
+        isPublished: isPublished === 'true' || isPublished === true,
+        tags: typeof tags === 'string' ? JSON.parse(tags) : (tags || [])
       });
       
       res.status(201).json({
@@ -119,6 +120,7 @@ router.post(
         data: insight
       });
     } catch (err) {
+      console.error('Error creating insight:', err);
       next(err);
     }
   }
@@ -134,13 +136,14 @@ router.put(
   upload.single('thumbnail'),
   async (req, res, next) => {
     try {
-      const { title, content, isPublished, tags } = req.body;
+      const { title, content, author, isPublished, tags } = req.body;
       
       let updateData = {
         title,
         content,
-        isPublished: isPublished === 'true',
-        tags: tags ? JSON.parse(tags) : []
+        author,
+        isPublished: isPublished === 'true' || isPublished === true,
+        tags: typeof tags === 'string' ? JSON.parse(tags) : (tags || [])
       };
       
       // Upload new thumbnail if provided
@@ -173,6 +176,32 @@ router.put(
     }
   }
 );
+
+// @desc    Toggle publish status
+// @route   PATCH /api/insights/:id/publish
+// @access  Private/Admin
+router.patch('/:id/publish', protect, authorize('admin'), async (req, res, next) => {
+  try {
+    const insight = await Insight.findById(req.params.id);
+    
+    if (!insight) {
+      return res.status(404).json({
+        success: false,
+        error: 'Insight not found'
+      });
+    }
+    
+    insight.isPublished = !insight.isPublished;
+    await insight.save();
+    
+    res.json({
+      success: true,
+      data: insight
+    });
+  } catch (err) {
+    next(err);
+  }
+});
 
 // @desc    Delete insight
 // @route   DELETE /api/insights/:id

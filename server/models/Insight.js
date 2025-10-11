@@ -13,17 +13,19 @@ const insightSchema = new mongoose.Schema({
     trim: true
   },
   author: {
+    type: String,
+    trim: true
+  },
+  authorId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-    required: true
+    ref: 'User'
   },
   date: {
     type: Date,
     default: Date.now
   },
   thumbnailUrl: {
-    type: String,
-    required: [true, 'Thumbnail URL is required']
+    type: String
   },
   slug: {
     type: String,
