@@ -1,7 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 import { FaPlus, FaEdit, FaTrash, FaGripVertical, FaSearch, FaSpinner } from 'react-icons/fa';
 import CouncilMemberForm from '../../components/admin/CouncilMemberForm';
 import councilService from '../../services/councilService';
@@ -19,6 +34,13 @@ const ManageCouncil = () => {
   const [selectedMember, setSelectedMember] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
+
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
 
   // Fetch all council members
   const fetchMembers = async () => {
@@ -97,12 +119,15 @@ const ManageCouncil = () => {
   };
 
   // Handle drag end for reordering
-  const onDragEnd = async (result) => {
-    if (!result.destination) return;
+  const handleDragEnd = async (event) => {
+    const { active, over } = event;
 
-    const items = Array.from(filteredMembers);
-    const [reorderedItem] = items.splice(result.source.index, 1);
-    items.splice(result.destination.index, 0, reorderedItem);
+    if (!over || active.id === over.id) return;
+
+    const oldIndex = filteredMembers.findIndex((m) => m._id === active.id);
+    const newIndex = filteredMembers.findIndex((m) => m._id === over.id);
+
+    const items = arrayMove(filteredMembers, oldIndex, newIndex);
 
     // Update local state immediately for better UX
     setFilteredMembers(items);
@@ -208,129 +233,152 @@ const ManageCouncil = () => {
           ) : (
             /* Members List */
             <div className="bg-white shadow overflow-hidden sm:rounded-md">
-              <DragDropContext onDragEnd={onDragEnd}>
-                <Droppable droppableId="members">
-                  {(provided) => (
-                    <ul
-                      {...provided.droppableProps}
-                      ref={provided.innerRef}
-                      className="divide-y divide-gray-200"
-                    >
-                      {filteredMembers.map((member, index) => (
-                        <Draggable
-                          key={member._id}
-                          draggableId={member._id}
-                          index={index}
-                        >
-                          {(provided) => (
-                            <li
-                              ref={provided.innerRef}
-                              {...provided.draggableProps}
-                              className="bg-white hover:bg-gray-50"
-                            >
-                              <div className="px-4 py-4 sm:px-6">
-                                <div className="flex items-center justify-between">
-                                  <div className="flex items-center flex-1 min-w-0">
-                                    <div
-                                      {...provided.dragHandleProps}
-                                      className="mr-3 text-gray-400 hover:text-gray-600 cursor-move"
-                                    >
-                                      <FaGripVertical />
-                                    </div>
-                                    <div className="flex-shrink-0 h-16 w-16 rounded-full overflow-hidden">
-                                      <img
-                                        className="h-full w-full object-cover"
-                                        src={member.image || '/images/avatar-placeholder.png'}
-                                        alt={member.name}
-                                      />
-                                    </div>
-                                    <div className="ml-4 flex-1 min-w-0">
-                                      <div className="flex items-center">
-                                        <h2 className="text-lg font-medium text-gray-900 truncate">
-                                          {member.name}
-                                        </h2>
-                                        <span
-                                          className={`ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                                            member.isActive
-                                              ? 'bg-green-100 text-green-800'
-                                              : 'bg-gray-100 text-gray-800'
-                                          }`}
-                                        >
-                                          {member.isActive ? 'Active' : 'Inactive'}
-                                        </span>
-                                      </div>
-                                      <p className="text-sm text-gray-600 truncate">
-                                        {member.role}
-                                      </p>
-                                    </div>
-                                  </div>
-                                  <div className="ml-4 flex-shrink-0 flex space-x-2">
-                                    <button
-                                      onClick={() => toggleStatus(member)}
-                                      className={`px-3 py-1 rounded-md text-sm font-medium ${
-                                        member.isActive
-                                          ? 'bg-yellow-100 text-yellow-800 hover:bg-yellow-200'
-                                          : 'bg-green-100 text-green-800 hover:bg-green-200'
-                                      }`}
-                                    >
-                                      {member.isActive ? 'Deactivate' : 'Activate'}
-                                    </button>
-                                    <button
-                                      onClick={() => handleEdit(member)}
-                                      className="p-2 text-blue-600 hover:text-blue-900"
-                                      title="Edit"
-                                    >
-                                      <FaEdit />
-                                    </button>
-                                    <button
-                                      onClick={() => confirmDelete(member)}
-                                      className="p-2 text-red-600 hover:text-red-900"
-                                      title="Delete"
-                                    >
-                                      <FaTrash />
-                                    </button>
-                                  </div>
-                                </div>
-                              </div>
-                            </li>
-                          )}
-                        </Draggable>
-                      ))}
-                      {provided.placeholder}
-                    </ul>
-                  )}
-                </Droppable>
-              </DragDropContext>
+              <DndContext
+                sensors={sensors}
+                collisionDetection={closestCenter}
+                onDragEnd={handleDragEnd}
+              >
+                <SortableContext
+                  items={filteredMembers.map((m) => m._id)}
+                  strategy={verticalListSortingStrategy}
+                >
+                  <ul className="divide-y divide-gray-200">
+                    {filteredMembers.map((member) => (
+                      <SortableItem
+                        key={member._id}
+                        member={member}
+                        onEdit={handleEdit}
+                        onDelete={confirmDelete}
+                        onToggleStatus={toggleStatus}
+                      />
+                    ))}
+                  </ul>
+                </SortableContext>
+              </DndContext>
             </div>
           )}
         </>
       )}
 
-      {/* Member Form Modal */}
+      {/* Modals */}
       <Modal
         isOpen={showForm}
-        onClose={handleCloseForm}
-        title={selectedMember ? 'Edit Council Member' : 'Add New Council Member'}
+        onClose={() => {
+          setShowForm(false);
+          setSelectedMember(null);
+        }}
+        title={selectedMember ? 'Edit Council Member' : 'Add Council Member'}
       >
         <CouncilMemberForm
           member={selectedMember}
           onSubmit={handleSubmit}
-          onCancel={handleCloseForm}
+          onCancel={() => {
+            setShowForm(false);
+            setSelectedMember(null);
+          }}
           isSubmitting={isSubmitting}
         />
       </Modal>
 
-      {/* Delete Confirmation Dialog */}
       <ConfirmDialog
         isOpen={showDeleteDialog}
-        onClose={() => setShowDeleteDialog(false)}
+        onClose={() => {
+          setShowDeleteDialog(false);
+          setSelectedMember(null);
+        }}
         onConfirm={handleDelete}
         title="Delete Council Member"
         message={`Are you sure you want to delete ${selectedMember?.name}? This action cannot be undone.`}
         confirmText="Delete"
-        confirmColor="red"
+        confirmButtonClass="bg-red-600 hover:bg-red-700"
       />
     </div>
+  );
+};
+
+// Sortable Item Component
+const SortableItem = ({ member, onEdit, onDelete, onToggleStatus }) => {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+  } = useSortable({ id: member._id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+  };
+
+  return (
+    <li ref={setNodeRef} style={style} className="bg-white hover:bg-gray-50">
+      <div className="px-4 py-4 sm:px-6">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center flex-1 min-w-0">
+            <div
+              {...attributes}
+              {...listeners}
+              className="mr-3 text-gray-400 hover:text-gray-600 cursor-move"
+            >
+              <FaGripVertical />
+            </div>
+            <div className="flex-shrink-0 h-16 w-16 rounded-full overflow-hidden">
+              <img
+                className="h-full w-full object-cover"
+                src={member.image || '/images/avatar-placeholder.png'}
+                alt={member.name}
+              />
+            </div>
+            <div className="ml-4 flex-1 min-w-0">
+              <div className="flex items-center">
+                <h2 className="text-lg font-medium text-gray-900 truncate">
+                  {member.name}
+                </h2>
+                <span
+                  className={`ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                    member.isActive
+                      ? 'bg-green-100 text-green-800'
+                      : 'bg-gray-100 text-gray-800'
+                  }`}
+                >
+                  {member.isActive ? 'Active' : 'Inactive'}
+                </span>
+              </div>
+              <p className="text-sm text-gray-600 truncate">
+                {member.role}
+              </p>
+            </div>
+          </div>
+          <div className="ml-4 flex-shrink-0 flex space-x-2">
+            <button
+              onClick={() => onToggleStatus(member)}
+              className={`px-3 py-1 rounded-md text-sm font-medium ${
+                member.isActive
+                  ? 'bg-yellow-100 text-yellow-800 hover:bg-yellow-200'
+                  : 'bg-green-100 text-green-800 hover:bg-green-200'
+              }`}
+            >
+              {member.isActive ? 'Deactivate' : 'Activate'}
+            </button>
+            <button
+              onClick={() => onEdit(member)}
+              className="p-2 text-blue-600 hover:text-blue-900"
+              title="Edit"
+            >
+              <FaEdit />
+            </button>
+            <button
+              onClick={() => onDelete(member)}
+              className="p-2 text-red-600 hover:text-red-900"
+              title="Delete"
+            >
+              <FaTrash />
+            </button>
+          </div>
+        </div>
+      </div>
+    </li>
   );
 };
 
