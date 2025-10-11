@@ -1,15 +1,27 @@
-import Course from '../models/Course.js';
+import admin from 'firebase-admin';
 import { uploadToCloudinary } from '../utils/cloudinary.js';
+
+const db = admin.firestore();
 
 // Get all courses
 export const getAllCourses = async (req, res) => {
   try {
-    const courses = await Course.find({ isPublished: true })
-      .select('title description category duration level instructor image enrolledStudents rating reviews')
-      .sort({ createdAt: -1 });
+    const coursesSnapshot = await db.collection('courses').get();
+    const courses = [];
+    
+    coursesSnapshot.forEach(doc => {
+      const courseData = doc.data();
+      courses.push({
+        id: doc.id,
+        ...courseData,
+        // Don't include full modules in list view
+        moduleCount: courseData.modules ? courseData.modules.length : 0
+      });
+    });
     
     res.json({
       success: true,
+      count: courses.length,
       data: courses
     });
   } catch (error) {
@@ -25,9 +37,10 @@ export const getAllCourses = async (req, res) => {
 export const getCourseContent = async (req, res) => {
   try {
     const { courseId } = req.params;
-    const course = await Course.findById(courseId);
     
-    if (!course) {
+    const doc = await db.collection('courses').doc(courseId).get();
+    
+    if (!doc.exists) {
       return res.status(404).json({
         success: false,
         error: 'Course not found'
@@ -36,7 +49,7 @@ export const getCourseContent = async (req, res) => {
     
     res.json({
       success: true,
-      data: course.modules || []
+      data: { id: doc.id, ...doc.data() }
     });
   } catch (error) {
     console.error('Error fetching course content:', error);
@@ -51,32 +64,39 @@ export const getCourseContent = async (req, res) => {
 export const addWeek = async (req, res) => {
   try {
     const { courseId } = req.params;
-    const { title, description, duration, order } = req.body;
+    const { title, description, order } = req.body;
     
-    const course = await Course.findById(courseId);
-    if (!course) {
+    const docRef = db.collection('courses').doc(courseId);
+    const doc = await docRef.get();
+    
+    if (!doc.exists) {
       return res.status(404).json({
         success: false,
         error: 'Course not found'
       });
     }
     
-    const newWeek = {
-      id: `week-${course.modules.length + 1}`,
+    const courseData = doc.data();
+    const modules = courseData.modules || [];
+    
+    const newModule = {
+      id: `week_${Date.now()}`,
       title,
-      description,
-      duration,
-      order: order || course.modules.length + 1,
+      description: description || '',
+      order: order || modules.length + 1,
       lessons: []
     };
     
-    course.modules.push(newWeek);
-    await course.save();
+    modules.push(newModule);
     
-    res.json({
+    await docRef.update({
+      modules,
+      updatedAt: admin.firestore.FieldValue.serverTimestamp()
+    });
+    
+    res.status(201).json({
       success: true,
-      message: 'Week added successfully',
-      data: newWeek
+      data: newModule
     });
   } catch (error) {
     console.error('Error adding week:', error);
@@ -91,34 +111,45 @@ export const addWeek = async (req, res) => {
 export const updateWeek = async (req, res) => {
   try {
     const { courseId, weekId } = req.params;
-    const { title, description, duration } = req.body;
+    const { title, description, order } = req.body;
     
-    const course = await Course.findById(courseId);
-    if (!course) {
+    const docRef = db.collection('courses').doc(courseId);
+    const doc = await docRef.get();
+    
+    if (!doc.exists) {
       return res.status(404).json({
         success: false,
         error: 'Course not found'
       });
     }
     
-    const week = course.modules.id(weekId);
-    if (!week) {
+    const courseData = doc.data();
+    const modules = courseData.modules || [];
+    
+    const moduleIndex = modules.findIndex(m => m.id === weekId);
+    
+    if (moduleIndex === -1) {
       return res.status(404).json({
         success: false,
         error: 'Week not found'
       });
     }
     
-    if (title) week.title = title;
-    if (description) week.description = description;
-    if (duration) week.duration = duration;
+    modules[moduleIndex] = {
+      ...modules[moduleIndex],
+      title: title || modules[moduleIndex].title,
+      description: description !== undefined ? description : modules[moduleIndex].description,
+      order: order !== undefined ? order : modules[moduleIndex].order
+    };
     
-    await course.save();
+    await docRef.update({
+      modules,
+      updatedAt: admin.firestore.FieldValue.serverTimestamp()
+    });
     
     res.json({
       success: true,
-      message: 'Week updated successfully',
-      data: week
+      data: modules[moduleIndex]
     });
   } catch (error) {
     console.error('Error updating week:', error);
@@ -134,16 +165,32 @@ export const deleteWeek = async (req, res) => {
   try {
     const { courseId, weekId } = req.params;
     
-    const course = await Course.findById(courseId);
-    if (!course) {
+    const docRef = db.collection('courses').doc(courseId);
+    const doc = await docRef.get();
+    
+    if (!doc.exists) {
       return res.status(404).json({
         success: false,
         error: 'Course not found'
       });
     }
     
-    course.modules.id(weekId).remove();
-    await course.save();
+    const courseData = doc.data();
+    const modules = courseData.modules || [];
+    
+    const filteredModules = modules.filter(m => m.id !== weekId);
+    
+    if (filteredModules.length === modules.length) {
+      return res.status(404).json({
+        success: false,
+        error: 'Week not found'
+      });
+    }
+    
+    await docRef.update({
+      modules: filteredModules,
+      updatedAt: admin.firestore.FieldValue.serverTimestamp()
+    });
     
     res.json({
       success: true,
@@ -162,60 +209,70 @@ export const deleteWeek = async (req, res) => {
 export const addContent = async (req, res) => {
   try {
     const { courseId, weekId } = req.params;
-    const { title, type, content, duration, difficulty, points, order } = req.body;
+    const { title, type, content, difficulty, points, timeEstimate, questions } = req.body;
     
-    const course = await Course.findById(courseId);
-    if (!course) {
+    const docRef = db.collection('courses').doc(courseId);
+    const doc = await docRef.get();
+    
+    if (!doc.exists) {
       return res.status(404).json({
         success: false,
         error: 'Course not found'
       });
     }
     
-    const week = course.modules.id(weekId);
-    if (!week) {
+    const courseData = doc.data();
+    const modules = courseData.modules || [];
+    
+    const moduleIndex = modules.findIndex(m => m.id === weekId);
+    
+    if (moduleIndex === -1) {
       return res.status(404).json({
         success: false,
         error: 'Week not found'
       });
     }
     
-    // Handle image uploads if present
-    let imageUrls = [];
+    // Upload images to Cloudinary if any
+    const imageUrls = [];
     if (req.files && req.files.length > 0) {
       for (const file of req.files) {
-        const result = await uploadToCloudinary(file.path);
-        imageUrls.push(result.secure_url);
+        try {
+          const result = await uploadToCloudinary(file.path, 'bytezen/courses');
+          imageUrls.push(result.secure_url);
+        } catch (err) {
+          console.error('Error uploading image:', err);
+        }
       }
     }
     
-    // Insert images into content if it's an article
-    let finalContent = content;
-    if (type === 'article' && imageUrls.length > 0) {
-      // Add images to the end of the content
-      const imageMarkdown = imageUrls.map(url => `\n\n![Image](${url})`).join('');
-      finalContent = content + imageMarkdown;
-    }
-    
-    const newContent = {
-      id: `${type}-${week.lessons.length + 1}`,
+    const newLesson = {
+      id: `lesson_${Date.now()}`,
       title,
-      type,
-      content: finalContent,
-      duration,
-      difficulty: type === 'problem' ? difficulty : undefined,
-      points: type === 'problem' ? points : undefined,
-      order: order || week.lessons.length + 1,
-      completed: false
+      type, // 'article', 'problem', 'quiz'
+      content: content || '',
+      difficulty: difficulty || 'medium',
+      points: points ? parseInt(points) : 0,
+      timeEstimate: timeEstimate ? parseInt(timeEstimate) : 0,
+      images: imageUrls,
+      order: modules[moduleIndex].lessons.length + 1
     };
     
-    week.lessons.push(newContent);
-    await course.save();
+    // Add quiz-specific data
+    if (type === 'quiz' && questions) {
+      newLesson.questions = typeof questions === 'string' ? JSON.parse(questions) : questions;
+    }
     
-    res.json({
+    modules[moduleIndex].lessons.push(newLesson);
+    
+    await docRef.update({
+      modules,
+      updatedAt: admin.firestore.FieldValue.serverTimestamp()
+    });
+    
+    res.status(201).json({
       success: true,
-      message: 'Content added successfully',
-      data: newContent
+      data: newLesson
     });
   } catch (error) {
     console.error('Error adding content:', error);
@@ -230,60 +287,79 @@ export const addContent = async (req, res) => {
 export const updateContent = async (req, res) => {
   try {
     const { courseId, weekId, contentId } = req.params;
-    const { title, content, duration, difficulty, points } = req.body;
+    const { title, type, content, difficulty, points, timeEstimate, questions } = req.body;
     
-    const course = await Course.findById(courseId);
-    if (!course) {
+    const docRef = db.collection('courses').doc(courseId);
+    const doc = await docRef.get();
+    
+    if (!doc.exists) {
       return res.status(404).json({
         success: false,
         error: 'Course not found'
       });
     }
     
-    const week = course.modules.id(weekId);
-    if (!week) {
+    const courseData = doc.data();
+    const modules = courseData.modules || [];
+    
+    const moduleIndex = modules.findIndex(m => m.id === weekId);
+    
+    if (moduleIndex === -1) {
       return res.status(404).json({
         success: false,
         error: 'Week not found'
       });
     }
     
-    const contentItem = week.lessons.id(contentId);
-    if (!contentItem) {
+    const lessonIndex = modules[moduleIndex].lessons.findIndex(l => l.id === contentId);
+    
+    if (lessonIndex === -1) {
       return res.status(404).json({
         success: false,
         error: 'Content not found'
       });
     }
     
-    // Handle image uploads if present
-    let imageUrls = [];
+    const currentLesson = modules[moduleIndex].lessons[lessonIndex];
+    
+    // Upload new images if any
+    const newImageUrls = [];
     if (req.files && req.files.length > 0) {
       for (const file of req.files) {
-        const result = await uploadToCloudinary(file.path);
-        imageUrls.push(result.secure_url);
+        try {
+          const result = await uploadToCloudinary(file.path, 'bytezen/courses');
+          newImageUrls.push(result.secure_url);
+        } catch (err) {
+          console.error('Error uploading image:', err);
+        }
       }
     }
     
-    if (title) contentItem.title = title;
-    if (content) {
-      let finalContent = content;
-      if (contentItem.type === 'article' && imageUrls.length > 0) {
-        const imageMarkdown = imageUrls.map(url => `\n\n![Image](${url})`).join('');
-        finalContent = content + imageMarkdown;
-      }
-      contentItem.content = finalContent;
-    }
-    if (duration) contentItem.duration = duration;
-    if (difficulty) contentItem.difficulty = difficulty;
-    if (points) contentItem.points = points;
+    // Update lesson
+    modules[moduleIndex].lessons[lessonIndex] = {
+      ...currentLesson,
+      title: title || currentLesson.title,
+      type: type || currentLesson.type,
+      content: content !== undefined ? content : currentLesson.content,
+      difficulty: difficulty || currentLesson.difficulty,
+      points: points ? parseInt(points) : currentLesson.points,
+      timeEstimate: timeEstimate ? parseInt(timeEstimate) : currentLesson.timeEstimate,
+      images: newImageUrls.length > 0 ? [...(currentLesson.images || []), ...newImageUrls] : currentLesson.images
+    };
     
-    await course.save();
+    // Update quiz questions if provided
+    if (type === 'quiz' && questions) {
+      modules[moduleIndex].lessons[lessonIndex].questions = typeof questions === 'string' ? JSON.parse(questions) : questions;
+    }
+    
+    await docRef.update({
+      modules,
+      updatedAt: admin.firestore.FieldValue.serverTimestamp()
+    });
     
     res.json({
       success: true,
-      message: 'Content updated successfully',
-      data: contentItem
+      data: modules[moduleIndex].lessons[lessonIndex]
     });
   } catch (error) {
     console.error('Error updating content:', error);
@@ -299,24 +375,42 @@ export const deleteContent = async (req, res) => {
   try {
     const { courseId, weekId, contentId } = req.params;
     
-    const course = await Course.findById(courseId);
-    if (!course) {
+    const docRef = db.collection('courses').doc(courseId);
+    const doc = await docRef.get();
+    
+    if (!doc.exists) {
       return res.status(404).json({
         success: false,
         error: 'Course not found'
       });
     }
     
-    const week = course.modules.id(weekId);
-    if (!week) {
+    const courseData = doc.data();
+    const modules = courseData.modules || [];
+    
+    const moduleIndex = modules.findIndex(m => m.id === weekId);
+    
+    if (moduleIndex === -1) {
       return res.status(404).json({
         success: false,
         error: 'Week not found'
       });
     }
     
-    week.lessons.id(contentId).remove();
-    await course.save();
+    const originalLength = modules[moduleIndex].lessons.length;
+    modules[moduleIndex].lessons = modules[moduleIndex].lessons.filter(l => l.id !== contentId);
+    
+    if (modules[moduleIndex].lessons.length === originalLength) {
+      return res.status(404).json({
+        success: false,
+        error: 'Content not found'
+      });
+    }
+    
+    await docRef.update({
+      modules,
+      updatedAt: admin.firestore.FieldValue.serverTimestamp()
+    });
     
     res.json({
       success: true,
