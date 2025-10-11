@@ -80,10 +80,10 @@ const AdminDashboard = () => {
     },
     {
       title: 'Course Management',
-      description: 'Create, edit, and manage course content and structure',
+      description: 'Add/edit articles, problems, quizzes with images',
       icon: FaBook,
       color: 'orange',
-      link: '/courses',
+      link: '/admin/courses',
       stats: `${stats.totalCourses} Courses`
     },
     {

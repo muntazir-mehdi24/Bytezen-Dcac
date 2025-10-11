@@ -24,6 +24,7 @@ import AdminDashboard from './pages/admin/AdminDashboard';
 import EnrollmentManagement from './pages/admin/EnrollmentManagement';
 import StudentManagement from './pages/admin/StudentManagement';
 import StudentProgressDashboard from './pages/admin/StudentProgressDashboard';
+import CourseManagement from './pages/admin/CourseManagement';
 import ManageEvents from './pages/admin/ManageEvents';
 import ManageInsights from './pages/admin/ManageInsights';
 import ManageTestimonials from './pages/admin/ManageTestimonials';
@@ -145,6 +146,13 @@ function AppRoutes() {
         <ProtectedRoute>
           <Layout>
             <StudentProgressDashboard />
+          </Layout>
+        </ProtectedRoute>
+      } />
+      <Route path="/admin/courses" element={
+        <ProtectedRoute>
+          <Layout>
+            <CourseManagement />
           </Layout>
         </ProtectedRoute>
       } />
