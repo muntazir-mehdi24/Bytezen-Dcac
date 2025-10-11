@@ -3773,6 +3773,8 @@ const CourseDetail = () => {
   const [activeTab, setActiveTab] = useState('chapters'); // chapters, live, leaderboard, noticeboard, attendance, progress
   const [sidebarOpen, setSidebarOpen] = useState(true); // Sidebar toggle state
   const [contentFilter, setContentFilter] = useState('all'); // all, articles, problems, quiz
+  const [showTickAnimation, setShowTickAnimation] = useState(false);
+  const [completionMessage, setCompletionMessage] = useState('');
   
   // Initialize course data and progress
   useEffect(() => {
@@ -3833,7 +3835,15 @@ const CourseDetail = () => {
       // Get current completion status
       const module = course.modules.find(m => m.id === moduleId);
       const lesson = module?.lessons.find(l => l.id === lessonId);
-      const newCompletedStatus = !lesson?.completed;
+      
+      // Check if already completed
+      if (lesson?.completed) {
+        setCompletionMessage('✓ Already marked as complete!');
+        setTimeout(() => setCompletionMessage(''), 2000);
+        return;
+      }
+      
+      const newCompletedStatus = true; // Always mark as complete, not toggle
       
       // Update backend
       await progressAPI.markLessonComplete(id, lessonId, newCompletedStatus);
@@ -3878,18 +3888,86 @@ const CourseDetail = () => {
         
         return { ...prevCourse, modules: updatedModules };
       });
+      
+      // Show tick animation
+      setShowTickAnimation(true);
+      setCompletionMessage('✓ Marked as complete!');
+      setTimeout(() => {
+        setShowTickAnimation(false);
+        setCompletionMessage('');
+      }, 2000);
     } catch (error) {
       console.error('Error updating lesson completion:', error);
-      alert('Failed to update progress. Please try again.');
+      setCompletionMessage('❌ Failed to update progress');
+      setTimeout(() => setCompletionMessage(''), 2000);
     }
   };
   
-  // Calculate progress (in a real app, this would come from user's progress)
+  // Calculate accurate progress based on ALL content (articles, problems, quizzes)
   useEffect(() => {
     if (course) {
-      const totalLessons = course.modules.reduce((total, module) => total + module.lessons.length, 0);
-      const completedLessons = course.modules.flatMap(m => m.lessons).filter(l => l.completed).length;
-      setProgress(Math.round((completedLessons / totalLessons) * 100) || 0);
+      let totalItems = 0;
+      let completedItems = 0;
+      
+      course.modules.forEach(module => {
+        module.lessons.forEach(lesson => {
+          if (lesson.type === 'day') {
+            // Count articles
+            if (lesson.articles) {
+              totalItems += lesson.articles.length;
+              completedItems += lesson.articles.filter(a => a.completed).length;
+            }
+            // Count problems
+            if (lesson.problems) {
+              totalItems += lesson.problems.length;
+              completedItems += lesson.problems.filter(p => p.completed).length;
+            }
+            // Count quizzes
+            if (lesson.quiz) {
+              totalItems += lesson.quiz.length;
+              completedItems += lesson.quiz.filter(q => q.completed).length;
+            }
+          } else {
+            // Regular lessons
+            totalItems += 1;
+            if (lesson.completed) completedItems += 1;
+          }
+        });
+      });
+      
+      const newProgress = totalItems > 0 ? Math.round((completedItems / totalItems) * 100) : 0;
+      setProgress(newProgress);
+      
+      // Calculate module progress
+      const newModuleProgress = {};
+      course.modules.forEach(module => {
+        let moduleTotal = 0;
+        let moduleCompleted = 0;
+        
+        module.lessons.forEach(lesson => {
+          if (lesson.type === 'day') {
+            if (lesson.articles) {
+              moduleTotal += lesson.articles.length;
+              moduleCompleted += lesson.articles.filter(a => a.completed).length;
+            }
+            if (lesson.problems) {
+              moduleTotal += lesson.problems.length;
+              moduleCompleted += lesson.problems.filter(p => p.completed).length;
+            }
+            if (lesson.quiz) {
+              moduleTotal += lesson.quiz.length;
+              moduleCompleted += lesson.quiz.filter(q => q.completed).length;
+            }
+          } else {
+            moduleTotal += 1;
+            if (lesson.completed) moduleCompleted += 1;
+          }
+        });
+        
+        newModuleProgress[module.id] = moduleTotal > 0 ? Math.round((moduleCompleted / moduleTotal) * 100) : 0;
+      });
+      
+      setModuleProgress(newModuleProgress);
     }
   }, [course]);
 
@@ -4379,6 +4457,18 @@ const CourseDetail = () => {
               </ReactMarkdown>
             </div>
 
+            {/* Completion Message */}
+            {completionMessage && (
+              <div className={`mt-6 p-4 rounded-lg text-center font-medium transition-all duration-300 ${
+                completionMessage.includes('✓') 
+                  ? 'bg-green-50 text-green-700 border-2 border-green-200' 
+                  : 'bg-red-50 text-red-700 border-2 border-red-200'
+              } ${showTickAnimation ? 'animate-bounce' : ''}`}>
+                <span className="text-2xl mr-2">{completionMessage.includes('✓') ? '✓' : '❌'}</span>
+                {completionMessage}
+              </div>
+            )}
+
             {/* Action Buttons */}
             <div className="mt-12 pt-8 border-t border-gray-200">
               <div className="flex items-center justify-between">
@@ -4411,9 +4501,11 @@ const CourseDetail = () => {
                       toggleLessonCompletion(moduleId, currentLesson.id);
                     }
                   }}
-                  className="px-8 py-3 bg-[#2f8d46] text-white rounded-lg font-semibold hover:bg-[#267a3a] transition-colors shadow-sm"
+                  className={`px-8 py-3 bg-[#2f8d46] text-white rounded-lg font-semibold hover:bg-[#267a3a] transition-all shadow-sm ${
+                    showTickAnimation ? 'scale-110' : ''
+                  }`}
                 >
-                  Mark as Read
+                  {currentLesson?.completed ? '✓ Completed' : 'Mark as Read'}
                 </button>
 
                 {/* Next Article Button */}
