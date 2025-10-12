@@ -3779,11 +3779,21 @@ const CourseDetail = () => {
   // Load progress from backend and merge with course data
   const loadProgressData = async () => {
     try {
+      // Fetch course from Firebase
+      const courseResponse = await courseAPI.getCourseContent(id);
+      let courseData = courseResponse.data.data;
+      
+      // If no course found in Firebase, fallback to hardcoded data
+      if (!courseData) {
+        courseData = JSON.parse(JSON.stringify(coursesData[id] || coursesData[1]));
+      } else {
+        // Convert Firebase 'modules' to 'modules' format expected by UI
+        courseData.modules = courseData.modules || [];
+      }
+      
+      // Fetch progress data
       const response = await progressAPI.getCourseProgress(id);
       const progressData = response.data.data;
-      
-      // Get base course data
-      const courseData = JSON.parse(JSON.stringify(coursesData[id] || coursesData[1]));
       
       // Merge progress data with course structure
       if (progressData) {
@@ -3847,9 +3857,19 @@ const CourseDetail = () => {
       setCourse(courseData);
     } catch (error) {
       console.error('Error loading progress:', error);
-      // Fallback to course data without progress
-      const courseData = coursesData[id] || coursesData[1];
-      setCourse(courseData);
+      // Fallback to hardcoded course data without progress
+      try {
+        const courseResponse = await courseAPI.getCourseContent(id);
+        const courseData = courseResponse.data.data;
+        if (courseData) {
+          setCourse(courseData);
+        } else {
+          setCourse(coursesData[id] || coursesData[1]);
+        }
+      } catch (err) {
+        console.error('Error loading course:', err);
+        setCourse(coursesData[id] || coursesData[1]);
+      }
     }
   };
 

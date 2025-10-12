@@ -1,38 +1,41 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { FaArrowLeft, FaArrowRight, FaChartLine, FaDatabase, FaServer } from 'react-icons/fa';
+import api from '../services/api';
 
-const courses = [
-  {
-    id: 1,
-    title: 'AI/ML Mastery',
-    description: 'Master machine learning algorithms and AI concepts with Python.',
-    icon: <FaChartLine className="w-8 h-8 text-[#2f8d46]" />,
-    category: 'AI/ML',
-    difficulty: 'Advanced',
-    duration: '12 weeks'
-  },
-  {
-    id: 2,
-    title: 'Data Analytics',
-    description: 'Learn data analysis and visualization with Python and popular libraries.',
-    icon: <FaDatabase className="w-8 h-8 text-[#2f8d46]" />,
-    category: 'Data Science',
-    difficulty: 'Intermediate',
-    duration: '10 weeks'
-  },
-  {
-    id: 3,
-    title: 'MERN Stack',
-    description: 'Build full-stack applications with MongoDB, Express, React, and Node.js.',
-    icon: <FaServer className="w-8 h-8 text-[#2f8d46]" />,
-    category: 'Web Development',
-    difficulty: 'Intermediate',
-    duration: '14 weeks'
-  }
-];
+// Icon mapping for categories
+const categoryIcons = {
+  'AI/ML': <FaChartLine className="w-8 h-8 text-[#2f8d46]" />,
+  'Data Science': <FaDatabase className="w-8 h-8 text-[#2f8d46]" />,
+  'Web Development': <FaServer className="w-8 h-8 text-[#2f8d46]" />
+};
 
 const CoursesPage = () => {
+  const [courses, setCourses] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchCourses();
+  }, []);
+
+  const fetchCourses = async () => {
+    try {
+      const response = await api.get('/courses');
+      setCourses(response.data.data || []);
+    } catch (error) {
+      console.error('Error fetching courses:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#2f8d46]"></div>
+      </div>
+    );
+  }
   return (
     <div className="min-h-screen bg-white py-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -58,7 +61,7 @@ const CoursesPage = () => {
               <div className="p-6">
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex items-center justify-center h-14 w-14 rounded-lg bg-[#f0f9f4] border-2 border-[#2f8d46]">
-                    {course.icon}
+                    {categoryIcons[course.category] || <FaChartLine className="w-8 h-8 text-[#2f8d46]" />}
                   </div>
                   <span className="inline-flex items-center px-2.5 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">
                     {course.difficulty}
