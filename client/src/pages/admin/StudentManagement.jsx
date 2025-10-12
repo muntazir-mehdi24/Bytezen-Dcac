@@ -31,6 +31,7 @@ const StudentManagement = () => {
       const response = await api.get('/enrollment/students', {
         headers: { Authorization: `Bearer ${token}` }
       });
+      console.log('Fetched students:', response.data.data); // Debug log
       setStudents(response.data.data || []);
     } catch (error) {
       console.error('Error fetching students:', error);

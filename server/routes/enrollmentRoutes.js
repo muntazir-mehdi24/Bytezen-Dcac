@@ -30,6 +30,8 @@ router.get('/students', protect, async (req, res) => {
           name: data.name || data.displayName || 'Unknown',
           email: data.email || '',
           role: data.role || 'student',
+          rollNumber: data.rollNumber || '',
+          department: data.department || '',
           enrolledCourses: data.enrolledCourses || []
         };
       })
@@ -254,6 +256,162 @@ router.post('/enroll', protect, async (req, res) => {
     res.status(500).json({
       success: false,
       error: 'Failed to enroll student',
+      message: error.message
+    });
+  }
+});
+
+// @route   POST /api/students
+// @desc    Create a new student
+// @access  Private (Admin/Instructor)
+router.post('/students', protect, async (req, res) => {
+  try {
+    const { name, email, rollNumber, department } = req.body;
+
+    if (!name || !email) {
+      return res.status(400).json({
+        success: false,
+        error: 'Name and email are required'
+      });
+    }
+
+    if (admin.apps.length === 0) {
+      return res.status(500).json({
+        success: false,
+        error: 'Firebase Admin not initialized'
+      });
+    }
+
+    const db = admin.firestore();
+    
+    // Check if user with email already exists
+    const existingUser = await db.collection('users')
+      .where('email', '==', email)
+      .get();
+
+    if (!existingUser.empty) {
+      return res.status(400).json({
+        success: false,
+        error: 'User with this email already exists'
+      });
+    }
+
+    // Create new user document
+    const newUserRef = db.collection('users').doc();
+    const userData = {
+      uid: newUserRef.id,
+      name,
+      email,
+      rollNumber: rollNumber || '',
+      department: department || '',
+      role: 'student',
+      enrolledCourses: [],
+      createdAt: admin.firestore.FieldValue.serverTimestamp()
+    };
+
+    await newUserRef.set(userData);
+
+    res.status(201).json({
+      success: true,
+      message: 'Student created successfully',
+      data: { ...userData, uid: newUserRef.id }
+    });
+  } catch (error) {
+    console.error('Error creating student:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to create student',
+      message: error.message
+    });
+  }
+});
+
+// @route   PUT /api/students/:id
+// @desc    Update a student
+// @access  Private (Admin/Instructor)
+router.put('/students/:id', protect, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { name, email, rollNumber, department } = req.body;
+
+    if (admin.apps.length === 0) {
+      return res.status(500).json({
+        success: false,
+        error: 'Firebase Admin not initialized'
+      });
+    }
+
+    const db = admin.firestore();
+    const userRef = db.collection('users').doc(id);
+    const userDoc = await userRef.get();
+
+    if (!userDoc.exists) {
+      return res.status(404).json({
+        success: false,
+        error: 'Student not found'
+      });
+    }
+
+    const updateData = {};
+    if (name) updateData.name = name;
+    if (email) updateData.email = email;
+    if (rollNumber !== undefined) updateData.rollNumber = rollNumber;
+    if (department !== undefined) updateData.department = department;
+    updateData.updatedAt = admin.firestore.FieldValue.serverTimestamp();
+
+    await userRef.update(updateData);
+
+    res.status(200).json({
+      success: true,
+      message: 'Student updated successfully',
+      data: { uid: id, ...updateData }
+    });
+  } catch (error) {
+    console.error('Error updating student:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to update student',
+      message: error.message
+    });
+  }
+});
+
+// @route   DELETE /api/students/:id
+// @desc    Delete a student
+// @access  Private (Admin/Instructor)
+router.delete('/students/:id', protect, async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (admin.apps.length === 0) {
+      return res.status(500).json({
+        success: false,
+        error: 'Firebase Admin not initialized'
+      });
+    }
+
+    const db = admin.firestore();
+    const userRef = db.collection('users').doc(id);
+    const userDoc = await userRef.get();
+
+    if (!userDoc.exists) {
+      return res.status(404).json({
+        success: false,
+        error: 'Student not found'
+      });
+    }
+
+    await userRef.delete();
+
+    res.status(200).json({
+      success: true,
+      message: 'Student deleted successfully'
+    });
+  } catch (error) {
+    console.error('Error deleting student:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to delete student',
       message: error.message
     });
   }
