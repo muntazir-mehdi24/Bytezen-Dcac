@@ -53,7 +53,7 @@ const StudentManagement = () => {
       
       if (editingStudent) {
         // Update existing student
-        await api.put(`/students/${editingStudent.uid}`, formData, {
+        await api.put(`/enrollment/students/${editingStudent.uid}`, formData, {
           headers: { Authorization: `Bearer ${token}` }
         });
         
@@ -79,7 +79,7 @@ const StudentManagement = () => {
         toast.success('Student updated and enrolled successfully!');
       } else {
         // Create new student
-        const response = await api.post('/students', formData, {
+        const response = await api.post('/enrollment/students', formData, {
           headers: { Authorization: `Bearer ${token}` }
         });
         
@@ -129,7 +129,7 @@ const StudentManagement = () => {
     
     try {
       const token = await user.getIdToken();
-      await api.delete(`/students/${studentId}`, {
+      await api.delete(`/enrollment/students/${studentId}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       toast.success('Student deleted successfully!');
