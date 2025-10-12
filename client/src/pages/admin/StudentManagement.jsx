@@ -55,13 +55,53 @@ const StudentManagement = () => {
         await api.put(`/students/${editingStudent.uid}`, formData, {
           headers: { Authorization: `Bearer ${token}` }
         });
-        toast.success('Student updated successfully!');
+        
+        // If department/course changed, update enrollment
+        if (formData.department && formData.department !== editingStudent.department) {
+          const courseIdMap = {
+            'AI/ML Mastery': '1',
+            'Data Analytics': '2',
+            'MERN Stack': '3'
+          };
+          const courseId = courseIdMap[formData.department];
+          
+          if (courseId) {
+            await api.post('/enrollment/bulk-enroll-selected', {
+              courseId: courseId,
+              studentIds: [editingStudent.uid]
+            }, {
+              headers: { Authorization: `Bearer ${token}` }
+            });
+          }
+        }
+        
+        toast.success('Student updated and enrolled successfully!');
       } else {
         // Create new student
-        await api.post('/students', formData, {
+        const response = await api.post('/students', formData, {
           headers: { Authorization: `Bearer ${token}` }
         });
-        toast.success('Student added successfully!');
+        
+        // Auto-enroll in selected course
+        if (formData.department && response.data.data?.uid) {
+          const courseIdMap = {
+            'AI/ML Mastery': '1',
+            'Data Analytics': '2',
+            'MERN Stack': '3'
+          };
+          const courseId = courseIdMap[formData.department];
+          
+          if (courseId) {
+            await api.post('/enrollment/bulk-enroll-selected', {
+              courseId: courseId,
+              studentIds: [response.data.data.uid]
+            }, {
+              headers: { Authorization: `Bearer ${token}` }
+            });
+          }
+        }
+        
+        toast.success('Student added and enrolled successfully!');
       }
       
       resetForm();
