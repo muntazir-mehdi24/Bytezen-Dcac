@@ -16,35 +16,6 @@ const eventSchema = new mongoose.Schema({
     type: Date,
     required: [true, 'Please provide a date for the event']
   },
-  time: {
-    type: String,
-    trim: true
-  },
-  location: {
-    type: String,
-    trim: true
-  },
-  eventType: {
-    type: String,
-    enum: ['workshop', 'webinar', 'hackathon', 'seminar', 'conference', 'meetup'],
-    default: 'workshop'
-  },
-  mode: {
-    type: String,
-    enum: ['offline', 'online', 'hybrid'],
-    default: 'offline'
-  },
-  registrationLink: {
-    type: String,
-    trim: true
-  },
-  maxParticipants: {
-    type: Number
-  },
-  isPublished: {
-    type: Boolean,
-    default: true
-  },
   images: [{
     type: String,
     trim: true
@@ -59,7 +30,8 @@ const eventSchema = new mongoose.Schema({
   },
   createdBy: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'User'
+    ref: 'User',
+    required: true
   }
 }, {
   timestamps: true,

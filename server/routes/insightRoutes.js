@@ -1,18 +1,10 @@
 import express from 'express';
-import multer from 'multer';
-import admin from 'firebase-admin';
 import { protect, authorize } from '../middleware/auth.js';
+import Insight from '../models/Insight.js';
+import { fileUpload } from '../middleware/upload.js';
 import { v2 as cloudinary } from 'cloudinary';
 
-const db = admin.firestore();
 const router = express.Router();
-
-// Configure multer
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, 'uploads/'),
-  filename: (req, file, cb) => cb(null, `${Date.now()}-${file.originalname}`)
-});
-const upload = multer({ storage });
 
 // Configure Cloudinary
 cloudinary.config({
@@ -26,54 +18,58 @@ cloudinary.config({
 // @access  Public
 router.get('/', async (req, res, next) => {
   try {
-    const { published } = req.query;
-    
-    let query = db.collection('insights');
+    const { page = 1, limit = 10, published } = req.query;
+    const query = {};
     
     if (published === 'true') {
-      query = query.where('isPublished', '==', true);
+      query.isPublished = true;
     }
     
-    const snapshot = await query.orderBy('createdAt', 'desc').get();
-    const insights = [];
-    
-    snapshot.forEach(doc => {
-      insights.push({ id: doc.id, ...doc.data() });
-    });
-    
+    const insights = await Insight.find(query)
+      .sort('-date')
+      .limit(limit * 1)
+      .skip((page - 1) * limit)
+      .populate('author', 'name')
+      .lean();
+
+    const count = await Insight.countDocuments(query);
+
     res.json({
       success: true,
-      count: insights.length,
-      data: insights
+      data: insights,
+      totalPages: Math.ceil(count / limit),
+      currentPage: Number(page),
+      count
     });
   } catch (err) {
-    console.error('Error fetching insights:', err);
     next(err);
   }
 });
 
-// @desc    Get single insight by ID
+// @desc    Get single insight
 // @route   GET /api/insights/:id
 // @access  Public
 router.get('/:id', async (req, res, next) => {
   try {
-    const doc = await db.collection('insights').doc(req.params.id).get();
-    
-    if (!doc.exists) {
+    const insight = await Insight.findById(req.params.id)
+      .populate('author', 'name email')
+      .lean();
+
+    if (!insight) {
       return res.status(404).json({
         success: false,
         error: 'Insight not found'
       });
     }
-    
-    // Increment view count
-    await db.collection('insights').doc(req.params.id).update({
-      viewCount: admin.firestore.FieldValue.increment(1)
-    });
-    
+
+    // Increment view count if published and not an admin
+    if (insight.isPublished && !req.user?.role === 'admin') {
+      await Insight.findByIdAndUpdate(req.params.id, { $inc: { viewCount: 1 } });
+    }
+
     res.json({
       success: true,
-      data: { id: doc.id, ...doc.data() }
+      data: insight
     });
   } catch (err) {
     next(err);
@@ -87,10 +83,10 @@ router.post(
   '/',
   protect,
   authorize('admin'),
-  upload.single('thumbnail'),
+  fileUpload.single('thumbnail'),
   async (req, res, next) => {
     try {
-      const { title, content, author, isPublished, tags } = req.body;
+      const { title, content, isPublished, tags } = req.body;
       
       let thumbnailUrl = '';
       
@@ -102,36 +98,20 @@ router.post(
         thumbnailUrl = result.secure_url;
       }
       
-      // Generate slug from title
-      const slug = title
-        .toLowerCase()
-        .replace(/[^\w\s-]/g, '')
-        .replace(/\s+/g, '-')
-        .replace(/--+/g, '-')
-        .trim();
-      
-      const insightData = {
+      const insight = await Insight.create({
         title,
         content,
-        author: author || req.user.name || 'Admin',
-        authorId: req.user.uid || req.user._id || req.user.id,
+        author: req.user.id,
         thumbnailUrl,
-        slug,
-        isPublished: isPublished === 'true' || isPublished === true,
-        tags: typeof tags === 'string' ? JSON.parse(tags) : (tags || []),
-        viewCount: 0,
-        createdAt: admin.firestore.FieldValue.serverTimestamp(),
-        updatedAt: admin.firestore.FieldValue.serverTimestamp()
-      };
-      
-      const docRef = await db.collection('insights').add(insightData);
+        isPublished: isPublished === 'true',
+        tags: tags ? JSON.parse(tags) : []
+      });
       
       res.status(201).json({
         success: true,
-        data: { id: docRef.id, ...insightData }
+        data: insight
       });
     } catch (err) {
-      console.error('Error creating insight:', err);
       next(err);
     }
   }
@@ -144,39 +124,17 @@ router.put(
   '/:id',
   protect,
   authorize('admin'),
-  upload.single('thumbnail'),
+  fileUpload.single('thumbnail'),
   async (req, res, next) => {
     try {
-      const { title, content, author, isPublished, tags } = req.body;
+      const { title, content, isPublished, tags } = req.body;
       
-      const docRef = db.collection('insights').doc(req.params.id);
-      const doc = await docRef.get();
-      
-      if (!doc.exists) {
-        return res.status(404).json({
-          success: false,
-          error: 'Insight not found'
-        });
-      }
-      
-      const updateData = {
+      let updateData = {
         title,
         content,
-        author,
-        isPublished: isPublished === 'true' || isPublished === true,
-        tags: typeof tags === 'string' ? JSON.parse(tags) : (tags || []),
-        updatedAt: admin.firestore.FieldValue.serverTimestamp()
+        isPublished: isPublished === 'true',
+        tags: tags ? JSON.parse(tags) : []
       };
-      
-      // Update slug if title changed
-      if (title) {
-        updateData.slug = title
-          .toLowerCase()
-          .replace(/[^\w\s-]/g, '')
-          .replace(/\s+/g, '-')
-          .replace(/--+/g, '-')
-          .trim();
-      }
       
       // Upload new thumbnail if provided
       if (req.file) {
@@ -186,11 +144,22 @@ router.put(
         updateData.thumbnailUrl = result.secure_url;
       }
       
-      await docRef.update(updateData);
+      const insight = await Insight.findByIdAndUpdate(
+        req.params.id,
+        updateData,
+        { new: true, runValidators: true }
+      );
+      
+      if (!insight) {
+        return res.status(404).json({
+          success: false,
+          error: 'Insight not found'
+        });
+      }
       
       res.json({
         success: true,
-        data: { id: req.params.id, ...updateData }
+        data: insight
       });
     } catch (err) {
       next(err);
@@ -198,64 +167,25 @@ router.put(
   }
 );
 
-// @desc    Toggle publish status
-// @route   PATCH /api/insights/:id/publish
-// @access  Private/Admin
-router.patch('/:id/publish', protect, authorize('admin'), async (req, res, next) => {
-  try {
-    const docRef = db.collection('insights').doc(req.params.id);
-    const doc = await docRef.get();
-    
-    if (!doc.exists) {
-      return res.status(404).json({
-        success: false,
-        error: 'Insight not found'
-      });
-    }
-    
-    const insightData = doc.data();
-    await docRef.update({
-      isPublished: !insightData.isPublished,
-      updatedAt: admin.firestore.FieldValue.serverTimestamp()
-    });
-    
-    res.json({
-      success: true,
-      data: { id: req.params.id, ...insightData, isPublished: !insightData.isPublished }
-    });
-  } catch (err) {
-    next(err);
-  }
-});
-
 // @desc    Delete insight
 // @route   DELETE /api/insights/:id
 // @access  Private/Admin
 router.delete('/:id', protect, authorize('admin'), async (req, res, next) => {
   try {
-    const docRef = db.collection('insights').doc(req.params.id);
-    const doc = await docRef.get();
+    const insight = await Insight.findByIdAndDelete(req.params.id);
     
-    if (!doc.exists) {
+    if (!insight) {
       return res.status(404).json({
         success: false,
         error: 'Insight not found'
       });
     }
     
-    const insightData = doc.data();
-    
     // Delete thumbnail from Cloudinary if it exists
-    if (insightData.thumbnailUrl) {
-      try {
-        const publicId = insightData.thumbnailUrl.split('/').pop().split('.')[0];
-        await cloudinary.uploader.destroy(`bytezen/insights/thumbnails/${publicId}`);
-      } catch (err) {
-        console.error('Error deleting thumbnail:', err);
-      }
+    if (insight.thumbnailUrl) {
+      const publicId = insight.thumbnailUrl.split('/').pop().split('.')[0];
+      await cloudinary.uploader.destroy(`bytezen/insights/thumbnails/${publicId}`);
     }
-    
-    await docRef.delete();
     
     res.json({
       success: true,

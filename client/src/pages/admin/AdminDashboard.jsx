@@ -17,7 +17,6 @@ import {
   FaBell
 } from 'react-icons/fa';
 import { useAuth } from '../../context/FirebaseAuthContext';
-import api from '../../services/api';
 
 const AdminDashboard = () => {
   const { user, userProfile } = useAuth();
@@ -43,45 +42,15 @@ const AdminDashboard = () => {
   }, [userProfile, navigate]);
 
   const fetchDashboardStats = async () => {
-    try {
-      // Fetch real data from APIs
-      const [studentsRes, coursesRes, eventsRes, insightsRes] = await Promise.all([
-        api.get('/students').catch(err => {
-          console.error('Students API error:', err.response?.data || err.message);
-          return { data: { data: [] } };
-        }),
-        api.get('/courses').catch(err => {
-          console.error('Courses API error:', err.response?.data || err.message);
-          return { data: { data: [] } };
-        }),
-        api.get('/events').catch(err => {
-          console.error('Events API error:', err.response?.data || err.message);
-          return { data: { data: [] } };
-        }),
-        api.get('/insights').catch(err => {
-          console.error('Insights API error:', err.response?.data || err.message);
-          return { data: { data: [] } };
-        })
-      ]);
-
-      console.log('Dashboard data:', {
-        students: studentsRes.data,
-        courses: coursesRes.data,
-        events: eventsRes.data,
-        insights: insightsRes.data
-      });
-
-      setStats({
-        totalStudents: studentsRes.data.data?.length || 0,
-        totalCourses: coursesRes.data.data?.length || 0,
-        activeEnrollments: 0, // Will be calculated from enrollment data
-        avgAttendance: 0, // Will be calculated from attendance data
-        totalEvents: eventsRes.data.data?.length || 0,
-        totalBytelogs: insightsRes.data.data?.length || 0
-      });
-    } catch (error) {
-      console.error('Error fetching dashboard stats:', error);
-    }
+    // TODO: Fetch real stats from API
+    setStats({
+      totalStudents: 19,
+      totalCourses: 3,
+      activeEnrollments: 45,
+      avgAttendance: 63.2,
+      totalEvents: 12,
+      totalBytelogs: 8
+    });
   };
 
   const adminModules = [

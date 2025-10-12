@@ -25,7 +25,6 @@ import EnrollmentManagement from './pages/admin/EnrollmentManagement';
 import StudentManagement from './pages/admin/StudentManagement';
 import StudentProgressDashboard from './pages/admin/StudentProgressDashboard';
 import CourseManagement from './pages/admin/CourseManagement';
-import CourseContentManagement from './pages/admin/CourseContentManagement';
 import ManageEvents from './pages/admin/ManageEvents';
 import EventsManagement from './pages/admin/EventsManagement';
 import ManageInsights from './pages/admin/ManageInsights';
@@ -156,7 +155,7 @@ function AppRoutes() {
       <Route path="/admin/courses" element={
         <ProtectedRoute>
           <Layout>
-            <CourseContentManagement />
+            <CourseManagement />
           </Layout>
         </ProtectedRoute>
       } />
