@@ -67,17 +67,47 @@ export const protect = async (req, res, next) => {
       // Find user by Firebase UID
       user = await User.findOne({ uid: firebaseUid }).select('-password');
       
-      // If user doesn't exist in MongoDB, create a basic user object from Firebase
+      // If user doesn't exist in MongoDB, fetch from Firestore
       if (!user) {
-        console.log('User not found in MongoDB, using Firebase data');
-        user = {
-          _id: firebaseUid,
-          uid: firebaseUid,
-          email: decodedToken.email,
-          name: decodedToken.name || decodedToken.email?.split('@')[0],
-          role: 'student',
-          toObject: function() { return this; }
-        };
+        console.log('User not found in MongoDB, fetching from Firestore');
+        try {
+          const db = admin.firestore();
+          const userDoc = await db.collection('users').doc(firebaseUid).get();
+          
+          if (userDoc.exists) {
+            const userData = userDoc.data();
+            user = {
+              _id: firebaseUid,
+              uid: firebaseUid,
+              email: userData.email || decodedToken.email,
+              name: userData.name || decodedToken.name || decodedToken.email?.split('@')[0],
+              role: userData.role || 'student',
+              toObject: function() { return this; }
+            };
+            console.log('User loaded from Firestore with role:', user.role);
+          } else {
+            // User doesn't exist in Firestore either, create default
+            user = {
+              _id: firebaseUid,
+              uid: firebaseUid,
+              email: decodedToken.email,
+              name: decodedToken.name || decodedToken.email?.split('@')[0],
+              role: 'student',
+              toObject: function() { return this; }
+            };
+          }
+        } catch (firestoreError) {
+          console.log('Firestore fetch error:', firestoreError.message);
+          // Fallback to basic user object
+          user = {
+            _id: firebaseUid,
+            uid: firebaseUid,
+            email: decodedToken.email,
+            name: decodedToken.name || decodedToken.email?.split('@')[0],
+            role: 'student',
+            toObject: function() { return this; }
+          };
+        }
       }
     } catch (firebaseError) {
       // Firebase verification failed, try JWT
