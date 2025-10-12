@@ -15,15 +15,10 @@ const StudentManagement = () => {
     name: '',
     email: '',
     rollNumber: '',
-    department: '',
-    division: '',
-    year: '',
-    phone: ''
+    department: ''
   });
 
-  const departments = ['Computer Science', 'Information Technology', 'Electronics', 'Mechanical', 'Civil'];
-  const divisions = ['A', 'B', 'C', 'D'];
-  const years = ['FE', 'SE', 'TE', 'BE'];
+  const departments = ['Python Programming', 'Data Science & AI/ML', 'Web Development'];
 
   useEffect(() => {
     fetchStudents();
@@ -83,10 +78,7 @@ const StudentManagement = () => {
       name: student.name || '',
       email: student.email || '',
       rollNumber: student.rollNumber || '',
-      department: student.department || '',
-      division: student.division || '',
-      year: student.year || '',
-      phone: student.phone || ''
+      department: student.department || ''
     });
     setShowModal(true);
   };
@@ -112,10 +104,7 @@ const StudentManagement = () => {
       name: '',
       email: '',
       rollNumber: '',
-      department: '',
-      division: '',
-      year: '',
-      phone: ''
+      department: ''
     });
     setEditingStudent(null);
     setShowModal(false);
@@ -188,13 +177,7 @@ const StudentManagement = () => {
                 Roll Number
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Department
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Division
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Year
+                Course
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Actions
@@ -218,16 +201,10 @@ const StudentManagement = () => {
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                   {student.rollNumber || 'N/A'}
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                  {student.department || 'N/A'}
-                </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
-                    {student.division || 'N/A'}
+                  <span className="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
+                    {student.department || 'N/A'}
                   </span>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                  {student.year || 'N/A'}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                   <button
@@ -302,77 +279,33 @@ const StudentManagement = () => {
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Roll Number
+                      Roll Number *
                     </label>
                     <input
                       type="text"
                       name="rollNumber"
                       value={formData.rollNumber}
                       onChange={handleInputChange}
+                      required
+                      placeholder="e.g., 2024001"
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2f8d46] focus:border-transparent"
                     />
                   </div>
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Phone
-                    </label>
-                    <input
-                      type="tel"
-                      name="phone"
-                      value={formData.phone}
-                      onChange={handleInputChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2f8d46] focus:border-transparent"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Department
+                      Course *
                     </label>
                     <select
                       name="department"
                       value={formData.department}
                       onChange={handleInputChange}
+                      required
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2f8d46] focus:border-transparent"
                     >
-                      <option value="">Select Department</option>
+                      <option value="">Select Course</option>
                       {departments.map(dept => (
                         <option key={dept} value={dept}>{dept}</option>
-                      ))}
-                    </select>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Division
-                    </label>
-                    <select
-                      name="division"
-                      value={formData.division}
-                      onChange={handleInputChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2f8d46] focus:border-transparent"
-                    >
-                      <option value="">Select Division</option>
-                      {divisions.map(div => (
-                        <option key={div} value={div}>{div}</option>
-                      ))}
-                    </select>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Year
-                    </label>
-                    <select
-                      name="year"
-                      value={formData.year}
-                      onChange={handleInputChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2f8d46] focus:border-transparent"
-                    >
-                      <option value="">Select Year</option>
-                      {years.map(year => (
-                        <option key={year} value={year}>{year}</option>
                       ))}
                     </select>
                   </div>
