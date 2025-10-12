@@ -18,7 +18,7 @@ const StudentManagement = () => {
     department: ''
   });
 
-  const departments = ['Python Programming', 'Data Science & AI/ML', 'Web Development'];
+  const departments = ['AI/ML Mastery', 'Data Analytics', 'MERN Stack'];
 
   useEffect(() => {
     fetchStudents();
