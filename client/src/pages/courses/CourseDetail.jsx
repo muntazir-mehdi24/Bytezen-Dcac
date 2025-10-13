@@ -3782,8 +3782,8 @@ const CourseDetail = () => {
       const response = await progressAPI.getCourseProgress(id);
       const progressData = response.data.data;
       
-      // Get base course data
-      const courseData = JSON.parse(JSON.stringify(coursesData[id] || coursesData[1]));
+      // Get base course data - convert id to number for lookup
+      const courseData = JSON.parse(JSON.stringify(coursesData[parseInt(id)] || coursesData[1]));
       
       // Merge progress data with course structure
       if (progressData) {
@@ -3847,8 +3847,8 @@ const CourseDetail = () => {
       setCourse(courseData);
     } catch (error) {
       console.error('Error loading progress:', error);
-      // Fallback to course data without progress
-      const courseData = coursesData[id] || coursesData[1];
+      // Fallback to course data without progress - convert id to number
+      const courseData = coursesData[parseInt(id)] || coursesData[1];
       setCourse(courseData);
     }
   };

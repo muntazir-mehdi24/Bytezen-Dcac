@@ -21,12 +21,19 @@ const StudentManagement = () => {
   const departments = ['AI/ML Mastery', 'Data Analytics', 'MERN Stack'];
 
   useEffect(() => {
-    fetchStudents();
-  }, []);
+    if (user) {
+      fetchStudents();
+    }
+  }, [user]);
 
   const fetchStudents = async () => {
     try {
       setLoading(true);
+      if (!user) {
+        console.log('No user found, skipping fetch');
+        setLoading(false);
+        return;
+      }
       const token = await user.getIdToken();
       const response = await api.get('/enrollment/students', {
         headers: { Authorization: `Bearer ${token}` }
@@ -35,7 +42,8 @@ const StudentManagement = () => {
       setStudents(response.data.data || []);
     } catch (error) {
       console.error('Error fetching students:', error);
-      toast.error('Failed to load students');
+      toast.error('Failed to load students: ' + (error.response?.data?.error || error.message));
+      setStudents([]); // Set empty array on error
     } finally {
       setLoading(false);
     }
