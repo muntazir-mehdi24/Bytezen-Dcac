@@ -175,10 +175,10 @@ const HomePage = () => {
               <div className="flex flex-wrap gap-3">
                 {isAuthenticated ? (
                   <Link
-                    to="/dashboard"
+                    to="/courses"
                     className="inline-flex items-center px-6 py-3 bg-[#2f8d46] text-white font-medium rounded hover:bg-[#267a3a] transition-colors"
                   >
-                    Go to Dashboard
+                    Go to Courses
                     <FaArrowRight className="ml-2" />
                   </Link>
                 ) : (
@@ -599,10 +599,10 @@ const HomePage = () => {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             {isAuthenticated ? (
               <Link
-                to="/dashboard"
+                to="/courses"
                 className="inline-flex items-center justify-center px-8 py-4 bg-white text-[#2f8d46] font-bold rounded-lg hover:bg-gray-100 transition-colors text-lg"
               >
-                Go to Dashboard
+                Go to Courses
                 <FaArrowRight className="ml-2" />
               </Link>
             ) : (
