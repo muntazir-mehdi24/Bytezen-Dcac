@@ -114,3 +114,64 @@ html {
 .link-gfg {
   @apply text-[#2f8d46] hover:underline transition-colors;
 }
+
+/* Mobile Responsiveness Fixes */
+@media (max-width: 768px) {
+  /* Prevent horizontal scroll */
+  body {
+    overflow-x: hidden;
+  }
+  
+  /* Make tables scrollable */
+  table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+  
+  /* Fix container padding */
+  .max-w-7xl, .max-w-6xl, .max-w-5xl {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+  
+  /* Hide fixed sidebars on mobile */
+  .fixed.left-0.w-72,
+  .fixed.left-0.w-16 {
+    display: none;
+  }
+  
+  /* Full width content on mobile */
+  .ml-72, .ml-16 {
+    margin-left: 0 !important;
+  }
+  
+  /* Stack flex columns */
+  .flex {
+    flex-direction: column;
+  }
+  
+  /* Responsive text sizes */
+  h1 {
+    font-size: 1.5rem !important;
+  }
+  
+  h2 {
+    font-size: 1.25rem !important;
+  }
+  
+  h3 {
+    font-size: 1.125rem !important;
+  }
+  
+  /* Button full width on mobile */
+  button {
+    width: 100%;
+  }
+  
+  /* Card spacing */
+  .grid {
+    grid-template-columns: 1fr !important;
+    gap: 1rem;
+  }
+}
