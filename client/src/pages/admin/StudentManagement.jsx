@@ -65,7 +65,7 @@ const StudentManagement = () => {
           headers: { Authorization: `Bearer ${token}` }
         });
         
-        // If department/course changed, update enrollment
+        // If department/course changed, replace enrollment (not add)
         if (formData.department && formData.department !== editingStudent.department) {
           const courseIdMap = {
             'AI/ML Mastery': '1',
@@ -75,9 +75,10 @@ const StudentManagement = () => {
           const courseId = courseIdMap[formData.department];
           
           if (courseId) {
-            await api.post('/enrollment/bulk-enroll-selected', {
-              courseId: courseId,
-              studentIds: [editingStudent.uid]
+            // Use set-course endpoint to REPLACE enrollment
+            await api.post('/enrollment/set-course', {
+              studentId: editingStudent.uid,
+              courseId: courseId
             }, {
               headers: { Authorization: `Bearer ${token}` }
             });
@@ -101,9 +102,9 @@ const StudentManagement = () => {
           const courseId = courseIdMap[formData.department];
           
           if (courseId) {
-            await api.post('/enrollment/bulk-enroll-selected', {
-              courseId: courseId,
-              studentIds: [response.data.data.uid]
+            await api.post('/enrollment/set-course', {
+              studentId: response.data.data.uid,
+              courseId: courseId
             }, {
               headers: { Authorization: `Bearer ${token}` }
             });

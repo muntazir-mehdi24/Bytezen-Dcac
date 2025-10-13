@@ -261,6 +261,58 @@ router.post('/enroll', protect, async (req, res) => {
   }
 });
 
+// @route   POST /api/enrollment/set-course
+// @desc    Set student's course (replaces all enrollments with single course)
+// @access  Private (Admin/Instructor)
+router.post('/set-course', protect, async (req, res) => {
+  try {
+    const { studentId, courseId } = req.body;
+
+    if (!studentId || !courseId) {
+      return res.status(400).json({
+        success: false,
+        error: 'Student ID and Course ID are required'
+      });
+    }
+
+    if (admin.apps.length === 0) {
+      return res.status(500).json({
+        success: false,
+        error: 'Firebase Admin not initialized'
+      });
+    }
+
+    const db = admin.firestore();
+    const userRef = db.collection('users').doc(studentId);
+    const userDoc = await userRef.get();
+
+    if (!userDoc.exists) {
+      return res.status(404).json({
+        success: false,
+        error: 'Student not found'
+      });
+    }
+
+    // Replace enrolledCourses with single course
+    await userRef.update({
+      enrolledCourses: [String(courseId)],
+      updatedAt: admin.firestore.FieldValue.serverTimestamp()
+    });
+
+    res.status(200).json({
+      success: true,
+      message: 'Student course updated successfully'
+    });
+  } catch (error) {
+    console.error('Error setting student course:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to set student course',
+      message: error.message
+    });
+  }
+});
+
 // @route   POST /api/students
 // @desc    Create a new student
 // @access  Private (Admin/Instructor)
