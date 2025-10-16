@@ -22,7 +22,7 @@ const LeaderboardTab = ({ courseId }) => {
       
       const token = await user.getIdToken();
       const response = await axios.get(
-        `${import.meta.env.VITE_API_URL}/api/attendance/combined-leaderboard/${courseId}`,
+        `${import.meta.env.VITE_API_URL}/attendance/combined-leaderboard/${courseId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`
