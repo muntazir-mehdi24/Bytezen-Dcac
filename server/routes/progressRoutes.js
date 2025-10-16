@@ -311,21 +311,56 @@ router.get('/admin/course/:courseId', protect, async (req, res) => {
     }
 
     const progressRecords = await Progress.find({ course: req.params.courseId })
-      .populate('user', 'name email profilePicture')
       .sort({ overallProgress: -1 });
 
-    const stats = progressRecords.map(progress => ({
-      user: progress.user,
-      overallProgress: progress.overallProgress || 0,
-      articlesCompleted: progress.totalArticlesCompleted || 0,
-      problemsCompleted: progress.totalProblemsCompleted || 0,
-      quizzesCompleted: progress.totalQuizzesCompleted || 0,
-      totalPoints: progress.totalPoints || 0,
-      timeSpent: progress.totalTimeSpent || 0,
-      currentStreak: progress.currentStreak || 0,
-      lastAccessed: progress.lastAccessed,
-      enrolledAt: progress.enrolledAt
-    }));
+    // Fetch user details from Firebase
+    const admin = (await import('firebase-admin')).default;
+    const usersMap = {};
+    
+    if (admin.apps.length > 0) {
+      try {
+        const db = admin.firestore();
+        const usersSnapshot = await db.collection('users').get();
+        
+        usersSnapshot.docs.forEach(doc => {
+          const data = doc.data();
+          const uid = data.userId || doc.id;
+          usersMap[uid] = {
+            _id: uid,
+            name: data.name || 'Unknown Student',
+            email: data.email || 'N/A',
+            profilePicture: data.profilePicture || null
+          };
+        });
+      } catch (error) {
+        console.error('Error fetching users from Firebase:', error);
+      }
+    }
+
+    const stats = progressRecords.map(progress => {
+      const userId = progress.user.toString();
+      const user = usersMap[userId] || {
+        _id: userId,
+        name: 'Unknown Student',
+        email: 'N/A',
+        profilePicture: null
+      };
+
+      return {
+        user: user,
+        userName: user.name,
+        userEmail: user.email,
+        overallProgress: progress.overallProgress || 0,
+        articlesCompleted: progress.totalArticlesCompleted || 0,
+        problemsCompleted: progress.totalProblemsCompleted || 0,
+        quizzesCompleted: progress.totalQuizzesCompleted || 0,
+        totalPoints: progress.totalPoints || 0,
+        timeSpent: progress.totalTimeSpent || 0,
+        currentStreak: progress.currentStreak || 0,
+        lastAccessed: progress.lastAccessed,
+        enrolledAt: progress.enrolledAt
+      };
+    });
 
     res.json({ success: true, data: stats });
   } catch (error) {
