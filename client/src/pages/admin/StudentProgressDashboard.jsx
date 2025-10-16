@@ -362,17 +362,17 @@ const StudentProgressDashboard = ({ courseId: propCourseId }) => {
                       {student.user?.profilePicture ? (
                         <img
                           src={student.user.profilePicture}
-                          alt={student.user.name}
+                          alt={student.user?.name || 'Student'}
                           className="w-10 h-10 rounded-full mr-3"
                         />
                       ) : (
                         <div className="w-10 h-10 rounded-full bg-[#2f8d46] text-white flex items-center justify-center mr-3 font-bold">
-                          {student.user?.name?.charAt(0).toUpperCase()}
+                          {(student.user?.name || student.userName || 'U')?.charAt(0).toUpperCase()}
                         </div>
                       )}
                       <div>
-                        <p className="font-medium text-gray-900">{student.user?.name}</p>
-                        <p className="text-sm text-gray-500">{student.user?.email}</p>
+                        <p className="font-medium text-gray-900">{student.user?.name || student.userName || 'Unknown Student'}</p>
+                        <p className="text-sm text-gray-500">{student.user?.email || student.userEmail || 'N/A'}</p>
                       </div>
                     </div>
                   </td>

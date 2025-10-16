@@ -21,6 +21,7 @@ const AttendanceManagement = ({ courseId }) => {
   const [studentAttendance, setStudentAttendance] = useState({});
   const [activeTab, setActiveTab] = useState('stats'); // stats, history
   const [searchTerm, setSearchTerm] = useState('');
+  const [modalSearchTerm, setModalSearchTerm] = useState('');
 
   useEffect(() => {
     fetchCourseAttendance();
@@ -80,6 +81,7 @@ const AttendanceManagement = ({ courseId }) => {
       if (response.data.success) {
         toast.success(`Attendance marked for ${attendanceRecords.length} students`);
         setShowMarkModal(false);
+        setModalSearchTerm('');
         fetchCourseAttendance();
         
         // Reset form
@@ -179,6 +181,7 @@ const AttendanceManagement = ({ courseId }) => {
         toast.success('Attendance updated successfully!');
         setShowEditModal(false);
         setEditingSession(null);
+        setModalSearchTerm('');
         fetchCourseAttendance();
       }
     } catch (err) {
@@ -597,6 +600,20 @@ const AttendanceManagement = ({ courseId }) => {
                 </div>
               </div>
 
+              {/* Search Filter */}
+              <div className="mb-3">
+                <div className="relative">
+                  <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                  <input
+                    type="text"
+                    placeholder="Search students by name or email..."
+                    value={modalSearchTerm}
+                    onChange={(e) => setModalSearchTerm(e.target.value)}
+                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2f8d46]"
+                  />
+                </div>
+              </div>
+
               {/* Students List */}
               <div className="max-h-96 overflow-y-auto border border-gray-200 rounded-lg">
                 {enrolledStudents.length === 0 ? (
@@ -614,7 +631,12 @@ const AttendanceManagement = ({ courseId }) => {
                       </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
-                      {enrolledStudents.map((student) => (
+                      {enrolledStudents
+                        .filter(student => 
+                          student.name?.toLowerCase().includes(modalSearchTerm.toLowerCase()) ||
+                          student.email?.toLowerCase().includes(modalSearchTerm.toLowerCase())
+                        )
+                        .map((student) => (
                         <tr key={student.uid} className="hover:bg-gray-50">
                           <td className="px-4 py-3">
                             <div>
@@ -786,6 +808,20 @@ const AttendanceManagement = ({ courseId }) => {
                 </div>
               </div>
 
+              {/* Search Filter */}
+              <div className="mb-3">
+                <div className="relative">
+                  <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                  <input
+                    type="text"
+                    placeholder="Search students by name or email..."
+                    value={modalSearchTerm}
+                    onChange={(e) => setModalSearchTerm(e.target.value)}
+                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2f8d46]"
+                  />
+                </div>
+              </div>
+
               {/* Students List */}
               <div className="max-h-96 overflow-y-auto border border-gray-200 rounded-lg">
                 <table className="min-w-full divide-y divide-gray-200">
@@ -800,7 +836,12 @@ const AttendanceManagement = ({ courseId }) => {
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
-                    {enrolledStudents.map((student) => (
+                    {enrolledStudents
+                      .filter(student => 
+                        student.name?.toLowerCase().includes(modalSearchTerm.toLowerCase()) ||
+                        student.email?.toLowerCase().includes(modalSearchTerm.toLowerCase())
+                      )
+                      .map((student) => (
                       <tr key={student.uid} className="hover:bg-gray-50">
                         <td className="px-4 py-3">
                           <div>
