@@ -59,9 +59,6 @@ app.use(cookieParser());
 // Serve static files
 app.use('/bytelogs', express.static(path.join(__dirname, 'public', 'bytelogs')));
 
-// Handle preflight requests explicitly
-app.options('*', cors());
-
 // Test route
 app.get('/api/test', (req, res) => {
   res.json({ message: 'API is working!' });
