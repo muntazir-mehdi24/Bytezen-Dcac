@@ -7,7 +7,8 @@ import {
   getCourseAttendance,
   getSessionAttendance,
   deleteAttendance,
-  getAttendanceLeaderboard
+  getAttendanceLeaderboard,
+  getCombinedLeaderboard
 } from '../controllers/attendanceController.js';
 import { protect } from '../middleware/auth.js';
 
@@ -16,6 +17,7 @@ const router = express.Router();
 // Public routes (with authentication)
 router.get('/my-stats/:courseId', protect, getMyAttendanceStats);
 router.get('/leaderboard/:courseId', protect, getAttendanceLeaderboard);
+router.get('/combined-leaderboard/:courseId', protect, getCombinedLeaderboard);
 
 // Teacher/Admin routes
 router.post('/mark', protect, markAttendance);

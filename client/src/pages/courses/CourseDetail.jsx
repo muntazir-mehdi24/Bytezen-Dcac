@@ -9,6 +9,7 @@ import AttendanceTab from '../../components/course/AttendanceTab';
 import AttendanceManagement from '../../components/course/AttendanceManagement';
 import ProgressTab from '../../components/course/ProgressTab';
 import StudentProgressDashboard from '../admin/StudentProgressDashboard';
+import LeaderboardTab from '../../components/course/LeaderboardTab';
 
 // Sample course data - in a real app, this would come from an API
 const aiMLCourse = {
@@ -4947,8 +4948,8 @@ const CourseDetail = () => {
             )}
 
             {activeTab === 'leaderboard' && (
-              <div className="text-center py-12">
-                <p className="text-gray-500">Leaderboard coming soon!</p>
+              <div className="bg-white shadow overflow-hidden sm:rounded-lg p-6">
+                <LeaderboardTab courseId={id} />
               </div>
             )}
 

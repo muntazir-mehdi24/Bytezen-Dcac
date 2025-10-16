@@ -417,3 +417,152 @@ export const getAttendanceLeaderboard = async (req, res) => {
     });
   }
 };
+
+// @desc    Get combined leaderboard (attendance + progress) for a course
+// @route   GET /api/attendance/combined-leaderboard/:courseId
+// @access  Private
+export const getCombinedLeaderboard = async (req, res) => {
+  try {
+    const { courseId } = req.params;
+    const limit = parseInt(req.query.limit) || 50;
+
+    // Import Progress model dynamically
+    const Progress = (await import('../models/Progress.js')).default;
+
+    // Get attendance stats
+    const attendanceStats = await Attendance.getCourseStats(courseId);
+    
+    // Get progress stats for all users in this course
+    const progressRecords = await Progress.find({ course: courseId });
+
+    // Create a map of userId to combined stats
+    const userStatsMap = {};
+
+    // Process attendance data
+    attendanceStats.forEach(stat => {
+      if (!userStatsMap[stat.userId]) {
+        userStatsMap[stat.userId] = {
+          userId: stat.userId,
+          userName: stat.userName || 'Unknown',
+          userEmail: stat.userEmail || '',
+          attendancePercentage: parseFloat(stat.percentage) || 0,
+          attendancePresent: stat.present || 0,
+          attendanceTotal: stat.total || 0,
+          progressPercentage: 0,
+          totalPoints: 0,
+          articlesCompleted: 0,
+          problemsCompleted: 0,
+          quizzesCompleted: 0,
+          currentStreak: 0
+        };
+      } else {
+        userStatsMap[stat.userId].attendancePercentage = parseFloat(stat.percentage) || 0;
+        userStatsMap[stat.userId].attendancePresent = stat.present || 0;
+        userStatsMap[stat.userId].attendanceTotal = stat.total || 0;
+      }
+    });
+
+    // Process progress data
+    progressRecords.forEach(progress => {
+      const userId = progress.user.toString();
+      
+      if (!userStatsMap[userId]) {
+        userStatsMap[userId] = {
+          userId: userId,
+          userName: 'Unknown',
+          userEmail: '',
+          attendancePercentage: 0,
+          attendancePresent: 0,
+          attendanceTotal: 0,
+          progressPercentage: progress.overallProgress || 0,
+          totalPoints: progress.totalPoints || 0,
+          articlesCompleted: progress.totalArticlesCompleted || 0,
+          problemsCompleted: progress.totalProblemsCompleted || 0,
+          quizzesCompleted: progress.totalQuizzesCompleted || 0,
+          currentStreak: progress.currentStreak || 0
+        };
+      } else {
+        userStatsMap[userId].progressPercentage = progress.overallProgress || 0;
+        userStatsMap[userId].totalPoints = progress.totalPoints || 0;
+        userStatsMap[userId].articlesCompleted = progress.totalArticlesCompleted || 0;
+        userStatsMap[userId].problemsCompleted = progress.totalProblemsCompleted || 0;
+        userStatsMap[userId].quizzesCompleted = progress.totalQuizzesCompleted || 0;
+        userStatsMap[userId].currentStreak = progress.currentStreak || 0;
+      }
+    });
+
+    // Fetch user details from Firebase for any missing names
+    try {
+      if (admin.apps.length > 0) {
+        const db = admin.firestore();
+        const usersSnapshot = await db.collection('users').get();
+        const usersMap = {};
+        
+        usersSnapshot.docs.forEach(doc => {
+          const data = doc.data();
+          const uid = data.userId || doc.id;
+          usersMap[uid] = {
+            name: data.name || 'Unknown Student',
+            email: data.email || ''
+          };
+        });
+        
+        // Update user names
+        Object.keys(userStatsMap).forEach(userId => {
+          if (usersMap[userId] && userStatsMap[userId].userName === 'Unknown') {
+            userStatsMap[userId].userName = usersMap[userId].name;
+            userStatsMap[userId].userEmail = usersMap[userId].email;
+          }
+        });
+      }
+    } catch (error) {
+      console.log('Error fetching user names from Firebase:', error.message);
+    }
+
+    // Calculate combined score
+    // Formula: (Attendance % * 0.4) + (Progress % * 0.4) + (Points * 0.2)
+    // Normalize points to 0-100 scale (assuming max 1000 points)
+    const leaderboardData = Object.values(userStatsMap).map(user => {
+      const normalizedPoints = Math.min((user.totalPoints / 1000) * 100, 100);
+      const combinedScore = (
+        (user.attendancePercentage * 0.4) +
+        (user.progressPercentage * 0.4) +
+        (normalizedPoints * 0.2)
+      ).toFixed(2);
+
+      return {
+        ...user,
+        combinedScore: parseFloat(combinedScore),
+        normalizedPoints: parseFloat(normalizedPoints.toFixed(2))
+      };
+    });
+
+    // Sort by combined score (descending)
+    leaderboardData.sort((a, b) => b.combinedScore - a.combinedScore);
+
+    // Add rank and limit results
+    const rankedLeaderboard = leaderboardData.slice(0, limit).map((user, index) => ({
+      rank: index + 1,
+      ...user
+    }));
+
+    res.status(200).json({
+      success: true,
+      data: rankedLeaderboard,
+      count: rankedLeaderboard.length,
+      scoringFormula: {
+        attendance: '40%',
+        progress: '40%',
+        points: '20%',
+        description: 'Combined Score = (Attendance% × 0.4) + (Progress% × 0.4) + (Normalized Points × 0.2)'
+      }
+    });
+  } catch (error) {
+    console.error('Error fetching combined leaderboard:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch combined leaderboard',
+      message: error.message
+    });
+  }
+};
