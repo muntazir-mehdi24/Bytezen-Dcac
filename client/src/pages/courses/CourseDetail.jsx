@@ -3780,11 +3780,21 @@ const CourseDetail = () => {
   // Load progress from backend and merge with course data
   const loadProgressData = async () => {
     try {
+      // Get base course data first - convert id to number for lookup
+      const courseId = parseInt(id);
+      const baseCourseData = coursesData[courseId];
+      
+      if (!baseCourseData) {
+        console.error(`Course with ID ${courseId} not found in coursesData`);
+        setCourse(null);
+        return;
+      }
+      
+      const courseData = JSON.parse(JSON.stringify(baseCourseData));
+      
+      // Try to fetch progress data
       const response = await progressAPI.getCourseProgress(id);
       const progressData = response.data.data;
-      
-      // Get base course data - convert id to number for lookup
-      const courseData = JSON.parse(JSON.stringify(coursesData[parseInt(id)] || coursesData[1]));
       
       // Merge progress data with course structure
       if (progressData) {
@@ -3849,8 +3859,15 @@ const CourseDetail = () => {
     } catch (error) {
       console.error('Error loading progress:', error);
       // Fallback to course data without progress - convert id to number
-      const courseData = coursesData[parseInt(id)] || coursesData[1];
-      setCourse(courseData);
+      const courseId = parseInt(id);
+      const courseData = coursesData[courseId];
+      
+      if (courseData) {
+        setCourse(courseData);
+      } else {
+        console.error(`Course with ID ${courseId} not found`);
+        setCourse(null);
+      }
     }
   };
 
