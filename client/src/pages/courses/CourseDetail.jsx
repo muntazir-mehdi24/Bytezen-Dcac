@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate, useLocation } from 'react-router-dom';
-import { FaArrowLeft, FaArrowRight, FaPlay, FaCheckCircle, FaLock, FaRegClock, FaChartLine, FaTasks, FaUserTie, FaBook, FaCertificate, FaBars, FaQuestionCircle, FaClipboardList, FaCalendarCheck } from 'react-icons/fa';
+import { FaArrowLeft, FaArrowRight, FaPlay, FaCheckCircle, FaLock, FaRegClock, FaChartLine, FaTasks, FaUserTie, FaBook, FaCertificate, FaBars, FaQuestionCircle, FaClipboardList, FaCalendarCheck, FaExclamationTriangle } from 'react-icons/fa';
 import ReactMarkdown from 'react-markdown';
 import CodeBlock from '../../components/CodeBlock';
 import { courseAPI, progressAPI } from '../../services/api';
@@ -4734,11 +4734,18 @@ const CourseDetail = () => {
                 <p className="mt-1 text-xs text-gray-500">Progress may take upto 2 hours to reflect.</p>
               </div>
             </div>
-            <div className="mt-6 md:mt-0 md:ml-6">
+            <div className="mt-6 md:mt-0 md:ml-6 flex gap-3">
               <button
                 className="px-6 py-2 border-2 border-gray-300 rounded text-sm font-medium text-gray-700 hover:bg-gray-50"
               >
                 Share Feedback
+              </button>
+              <button
+                className="px-6 py-2 bg-yellow-400 text-gray-900 rounded text-sm font-semibold hover:bg-yellow-500 transition-colors flex items-center gap-2"
+                title="Report an issue with this page"
+              >
+                <FaExclamationTriangle />
+                Report Issue
               </button>
             </div>
           </div>
@@ -5047,12 +5054,6 @@ const CourseDetail = () => {
                   <button className="w-full bg-[#2f8d46] text-white py-2 rounded text-sm font-medium hover:bg-[#267a3a]">
                     Add a schedule
                   </button>
-                </div>
-                <div className="mt-4 p-3 bg-yellow-50 rounded">
-                  <button className="w-full bg-yellow-400 text-gray-900 py-2 rounded text-sm font-semibold hover:bg-yellow-500">
-                    Report an Issue
-                  </button>
-                  <p className="text-xs text-gray-600 mt-2">If you are facing any issue on this page. Please let us know.</p>
                 </div>
               </div>
             </div>
