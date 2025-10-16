@@ -5027,36 +5027,6 @@ const CourseDetail = () => {
 
           {/* Sidebar */}
           <div className="lg:col-span-1">
-            {/* Live Classes Info */}
-            <div className="bg-white border border-gray-200 rounded-lg p-4 mb-6">
-              <div className="text-center">
-                <p className="text-xs text-gray-600 mb-2">Live classes attendance may take 2 hours to reflect. Attendance won't be considered in case the Classes get Cancelled.</p>
-                <div className="mt-4">
-                  <table className="w-full text-sm">
-                    <thead>
-                      <tr className="border-b">
-                        <th className="py-2 text-left text-gray-700">Live Classes</th>
-                        <th className="py-2 text-center text-gray-700">Attended</th>
-                        <th className="py-2 text-center text-gray-700">%</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td className="py-2 text-gray-600">{course.modules.length * 2}</td>
-                        <td className="py-2 text-center text-gray-600">{Math.floor(progress / 10)}</td>
-                        <td className="py-2 text-center text-gray-600">{Math.min(Math.floor(progress / 10) * 5, 100)}%</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-                <div className="mt-4 p-3 bg-blue-50 rounded">
-                  <p className="text-xs text-gray-700 mb-2">Use the scheduler to set your study hours and get notified on the App.</p>
-                  <button className="w-full bg-[#2f8d46] text-white py-2 rounded text-sm font-medium hover:bg-[#267a3a]">
-                    Add a schedule
-                  </button>
-                </div>
-              </div>
-            </div>
             {/* Course Details */}
             <div className="bg-white shadow overflow-hidden sm:rounded-lg mb-6">
               <div className="px-4 py-5 sm:px-6 border-b border-gray-200">
