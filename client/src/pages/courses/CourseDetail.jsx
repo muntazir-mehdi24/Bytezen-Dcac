@@ -4804,88 +4804,270 @@ All interests: {'AI', 'Python', 'Music', 'Data Science', 'Gaming', 'Web Dev'}
             problems: [
               {
                 id: '1-5-p1',
-                title: 'Dictionary Operations',
+                title: 'Student Dictionary Manager',
                 difficulty: 'Easy',
                 points: 3,
-                description: 'Create and manipulate a student dictionary.',
-                starterCode: `student = {"name": "Alice", "age": 20, "subjects": ["Math"]}
-# Add Chemistry to subjects
-# Update grade to A+
+                description: `Write a program to manage student information using a dictionary. You need to add a new subject to the student's subjects list and add a grade field.
+
+**Requirements:**
+1. Add "Chemistry" to the subjects list
+2. Add a new key "grade" with value "A+"
+3. Print the updated dictionary
+
+**Examples:**
+
+Input:
+\`\`\`
+student = {"name": "Alice", "age": 20, "subjects": ["Math", "Physics"]}
+\`\`\`
+
+Output:
+\`\`\`
+{'name': 'Alice', 'age': 20, 'subjects': ['Math', 'Physics', 'Chemistry'], 'grade': 'A+'}
+\`\`\`
+
+**Explanation:**
+This problem demonstrates dictionary manipulation and working with nested lists inside dictionaries.`,
+                starterCode: `# Student dictionary
+student = {"name": "Alice", "age": 20, "subjects": ["Math", "Physics"]}
+
+# TODO: Add Chemistry to subjects list
+
+
+# TODO: Add grade field with value "A+"
+
+
+# Print the result
 print(student)`,
-                solution: `student = {"name": "Alice", "age": 20, "subjects": ["Math"]}
+                solution: `# Student dictionary
+student = {"name": "Alice", "age": 20, "subjects": ["Math", "Physics"]}
+
+# Add Chemistry to subjects list
 student["subjects"].append("Chemistry")
+
+# Add grade field with value "A+"
 student["grade"] = "A+"
+
+# Print the result
 print(student)`,
-                testCases: [{ input: '', expectedOutput: 'Dictionary updated' }]
+                testCases: [
+                  { input: '', expectedOutput: "{'name': 'Alice', 'age': 20, 'subjects': ['Math', 'Physics', 'Chemistry'], 'grade': 'A+'}" }
+                ]
               },
               {
                 id: '1-5-p2',
                 title: 'Word Frequency Counter',
                 difficulty: 'Medium',
                 points: 4,
-                description: 'Count word frequency using dictionary.',
-                starterCode: `def count_words(sentence):
-    words = sentence.lower().split()
-    # Your code here
-    return word_count
+                description: `Create a function that counts the frequency of each word in a sentence using a dictionary. The function should be case-insensitive.
 
-print(count_words("hello world hello"))`,
-                solution: `def count_words(sentence):
+**Requirements:**
+1. Convert the sentence to lowercase
+2. Split the sentence into words
+3. Count each word's frequency using a dictionary
+4. Return the dictionary with word counts
+
+**Examples:**
+
+Input:
+\`\`\`
+count_words("Hello World Hello Python World")
+\`\`\`
+
+Output:
+\`\`\`
+{'hello': 2, 'world': 2, 'python': 1}
+\`\`\`
+
+**Explanation:**
+This problem teaches you how to use dictionaries for counting and the get() method for safe key access.`,
+                starterCode: `def count_words(sentence):
+    # Convert to lowercase and split into words
     words = sentence.lower().split()
     word_count = {}
-    for word in words:
-        word_count[word] = word_count.get(word, 0) + 1
+    
+    # TODO: Count frequency of each word
+    # Hint: Use word_count.get(word, 0) + 1
+    
+    
     return word_count
 
-print(count_words("hello world hello"))`,
-                testCases: [{ input: 'hello world hello', expectedOutput: "{'hello': 2, 'world': 1}" }]
+# Test your function
+print(count_words("Hello World Hello Python World"))`,
+                solution: `def count_words(sentence):
+    # Convert to lowercase and split into words
+    words = sentence.lower().split()
+    word_count = {}
+    
+    # Count frequency of each word
+    for word in words:
+        word_count[word] = word_count.get(word, 0) + 1
+    
+    return word_count
+
+# Test your function
+print(count_words("Hello World Hello Python World"))`,
+                testCases: [
+                  { input: 'Hello World Hello Python World', expectedOutput: "{'hello': 2, 'world': 2, 'python': 1}" }
+                ]
               },
               {
                 id: '1-5-p3',
-                title: 'Tuple Unpacking',
+                title: 'Coordinate Tuple Unpacking',
                 difficulty: 'Easy',
                 points: 2,
-                description: 'Practice tuple unpacking.',
-                starterCode: `coordinates = (10, 20, 30)
-# Unpack into x, y, z
+                description: `Practice tuple unpacking by extracting coordinates from a tuple into separate variables.
+
+**Requirements:**
+1. Unpack the coordinates tuple into three variables: x, y, z
+2. Print the values in the format: x=10, y=20, z=30
+
+**Examples:**
+
+Input:
+\`\`\`
+coordinates = (10, 20, 30)
+\`\`\`
+
+Output:
+\`\`\`
+x=10, y=20, z=30
+\`\`\`
+
+**Explanation:**
+Tuple unpacking allows you to assign multiple variables in a single line, making code cleaner and more readable.`,
+                starterCode: `# Coordinates tuple
+coordinates = (10, 20, 30)
+
+# TODO: Unpack the tuple into x, y, z variables
+
+
+# Print the result
 print(f"x={x}, y={y}, z={z}")`,
-                solution: `coordinates = (10, 20, 30)
+                solution: `# Coordinates tuple
+coordinates = (10, 20, 30)
+
+# Unpack the tuple into x, y, z variables
 x, y, z = coordinates
+
+# Print the result
 print(f"x={x}, y={y}, z={z}")`,
-                testCases: [{ input: '', expectedOutput: 'x=10, y=20, z=30' }]
+                testCases: [
+                  { input: '', expectedOutput: 'x=10, y=20, z=30' }
+                ]
               },
               {
                 id: '1-5-p4',
-                title: 'Set Operations',
+                title: 'Set Intersection Finder',
                 difficulty: 'Medium',
                 points: 4,
-                description: 'Find common and unique elements.',
-                starterCode: `set1 = {1, 2, 3, 4, 5}
+                description: `Use set operations to find common elements between two sets, elements unique to the first set, and all unique elements combined.
+
+**Requirements:**
+1. Find common elements (intersection) using the & operator
+2. Find elements only in set1 (difference) using the - operator
+3. Find all unique elements (union) using the | operator
+
+**Examples:**
+
+Input:
+\`\`\`
+set1 = {1, 2, 3, 4, 5}
 set2 = {4, 5, 6, 7, 8}
-# Find common elements
-print(f"Common: {common}")`,
-                solution: `set1 = {1, 2, 3, 4, 5}
+\`\`\`
+
+Output:
+\`\`\`
+Common: {4, 5}
+Only in set1: {1, 2, 3}
+All unique: {1, 2, 3, 4, 5, 6, 7, 8}
+\`\`\`
+
+**Explanation:**
+Set operations provide efficient ways to find relationships between collections of data.`,
+                starterCode: `# Two sets of numbers
+set1 = {1, 2, 3, 4, 5}
 set2 = {4, 5, 6, 7, 8}
+
+# TODO: Find common elements (intersection)
+
+
+# TODO: Find elements only in set1 (difference)
+
+
+# TODO: Find all unique elements (union)
+
+
+# Print results
+print(f"Common: {common}")
+print(f"Only in set1: {only_set1}")
+print(f"All unique: {all_unique}")`,
+                solution: `# Two sets of numbers
+set1 = {1, 2, 3, 4, 5}
+set2 = {4, 5, 6, 7, 8}
+
+# Find common elements (intersection)
 common = set1 & set2
-print(f"Common: {common}")`,
-                testCases: [{ input: '', expectedOutput: 'Common: {4, 5}' }]
+
+# Find elements only in set1 (difference)
+only_set1 = set1 - set2
+
+# Find all unique elements (union)
+all_unique = set1 | set2
+
+# Print results
+print(f"Common: {common}")
+print(f"Only in set1: {only_set1}")
+print(f"All unique: {all_unique}")`,
+                testCases: [
+                  { input: '', expectedOutput: 'Common: {4, 5}' }
+                ]
               },
               {
                 id: '1-5-p5',
-                title: 'Remove Duplicates',
+                title: 'Duplicate Remover',
                 difficulty: 'Easy',
                 points: 3,
-                description: 'Remove duplicates using sets.',
+                description: `Create a function that removes duplicates from a list and returns a sorted list of unique elements.
+
+**Requirements:**
+1. Convert the list to a set to remove duplicates
+2. Convert back to a list
+3. Sort the list in ascending order
+4. Return the sorted unique list
+
+**Examples:**
+
+Input:
+\`\`\`
+remove_duplicates([5, 2, 8, 2, 9, 5, 1])
+\`\`\`
+
+Output:
+\`\`\`
+[1, 2, 5, 8, 9]
+\`\`\`
+
+**Explanation:**
+Sets automatically remove duplicates, making them perfect for this task. The sorted() function then orders the elements.`,
                 starterCode: `def remove_duplicates(numbers):
-    # Your code here
+    # TODO: Convert to set, then to list, then sort
+    # Hint: Use set(), list(), and sorted()
+    
+    
     return result
 
+# Test your function
 print(remove_duplicates([5, 2, 8, 2, 9, 5, 1]))`,
                 solution: `def remove_duplicates(numbers):
+    # Convert to set to remove duplicates, then to sorted list
     return sorted(list(set(numbers)))
 
+# Test your function
 print(remove_duplicates([5, 2, 8, 2, 9, 5, 1]))`,
-                testCases: [{ input: '[5, 2, 8, 2, 9, 5, 1]', expectedOutput: '[1, 2, 5, 8, 9]' }]
+                testCases: [
+                  { input: '[5, 2, 8, 2, 9, 5, 1]', expectedOutput: '[1, 2, 5, 8, 9]' }
+                ]
               }
             ],
             quiz: [
