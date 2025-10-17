@@ -3767,6 +3767,7 @@ const CourseDetail = () => {
   const [activeModule, setActiveModule] = useState(null);
   const [enrolled, setEnrolled] = useState(true); // Default to true for demo
   const [course, setCourse] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [progress, setProgress] = useState(0);
   const [moduleProgress, setModuleProgress] = useState({});
   const [viewingArticle, setViewingArticle] = useState(null);
@@ -3780,6 +3781,7 @@ const CourseDetail = () => {
   // Load progress from backend and merge with course data
   const loadProgressData = async () => {
     try {
+      setLoading(true);
       // Get base course data first - convert id to number for lookup
       const courseId = parseInt(id);
       const baseCourseData = coursesData[courseId];
@@ -3787,6 +3789,7 @@ const CourseDetail = () => {
       if (!baseCourseData) {
         console.error(`Course with ID ${courseId} not found in coursesData`);
         setCourse(null);
+        setLoading(false);
         return;
       }
       
@@ -3856,6 +3859,7 @@ const CourseDetail = () => {
       }
       
       setCourse(courseData);
+      setLoading(false);
     } catch (error) {
       console.error('Error loading progress:', error);
       // Fallback to course data without progress - convert id to number
@@ -3868,6 +3872,7 @@ const CourseDetail = () => {
         console.error(`Course with ID ${courseId} not found`);
         setCourse(null);
       }
+      setLoading(false);
     }
   };
 
@@ -4681,6 +4686,17 @@ const CourseDetail = () => {
       </div>
     );
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-16 w-16 border-4 border-[#2f8d46] border-t-transparent mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading course...</p>
+        </div>
+      </div>
+    );
+  }
 
   if (!course) {
     return (
