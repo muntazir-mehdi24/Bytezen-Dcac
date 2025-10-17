@@ -76,9 +76,13 @@ const Quiz = ({ quiz, onComplete }) => {
   const isAnswered = answers[currentQuestion] !== undefined;
   const isCorrect = question && answers[currentQuestion] === question.correctAnswer;
 
-  const correctCount = quiz.questions.filter((q, i) => answers[i] === q.correctAnswer).length;
+  const correctCount = Array.isArray(quiz.questions) 
+    ? quiz.questions.filter((q, i) => answers[i] === q.correctAnswer).length 
+    : 0;
   const wrongCount = Object.keys(answers).length - correctCount;
-  const unansweredCount = quiz.questions.length - Object.keys(answers).length;
+  const unansweredCount = Array.isArray(quiz.questions) 
+    ? quiz.questions.length - Object.keys(answers).length 
+    : 0;
 
   if (quizCompleted) {
     const score = calculateScore();

@@ -109,7 +109,8 @@ const HomePage = () => {
   useEffect(() => {
     const fetchTestimonials = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/testimonials');
+        const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+        const response = await axios.get(`${apiUrl}/testimonials`);
         if (response.data.success && response.data.data.length > 0) {
           setTestimonials(response.data.data);
         }
