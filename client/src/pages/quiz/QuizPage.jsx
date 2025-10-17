@@ -354,15 +354,19 @@ const QuizPage = () => {
   const [quiz, setQuiz] = useState(null);
 
   useEffect(() => {
-    // Check if quiz data is passed via location state
+    // Check if quiz data is passed via location state (from course page)
     if (location.state && location.state.quiz) {
+      console.log('Using quiz data from location.state:', location.state.quiz);
       setQuiz(location.state.quiz);
     } else {
       // Fallback to local quizzesData
       const quizData = quizzesData[quizId];
+      console.log('Quiz data from quizzesData:', quizData);
+      
       if (quizData) {
         setQuiz(quizData);
       } else {
+        console.log('Quiz not found, redirecting...');
         navigate('/courses');
       }
     }
