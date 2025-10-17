@@ -3715,24 +3715,307 @@ print(flatten_list([['a'], ['b', 'c'], ['d']]))  # Should output ['a', 'b', 'c',
                 completed: false,
                 content: `# Python Dictionary
 
-Dictionaries store data in key:value pairs. They are ordered (Python 3.7+), changeable, and don't allow duplicate keys.
+A dictionary is a collection of key-value pairs that is ordered (Python 3.7+), changeable, and does not allow duplicate keys. Dictionaries are one of the most powerful and flexible data structures in Python.
 
-## Creating Dictionaries
-Dictionaries use curly braces with key-value pairs.
+## Understanding Dictionaries
+
+Dictionaries store data values in key:value pairs. Each key must be unique and immutable (strings, numbers, or tuples), while values can be of any data type.
+
+### Creating Dictionaries
+
+**Example 1: Basic Dictionary Creation**
+
+\`\`\`python
+# Empty dictionary
+empty_dict = {}
+
+# Dictionary with initial values
+student = {
+    "name": "Alice",
+    "age": 20,
+    "grade": "A",
+    "courses": ["Python", "Data Science"]
+}
+
+print(student)
+\`\`\`
+
+**Output:**
+\`\`\`
+{'name': 'Alice', 'age': 20, 'grade': 'A', 'courses': ['Python', 'Data Science']}
+\`\`\`
+
+**Example 2: Using dict() Constructor**
+
+\`\`\`python
+# Creating dictionary using dict()
+person = dict(name="Bob", age=25, city="New York")
+print(person)
+\`\`\`
+
+**Output:**
+\`\`\`
+{'name': 'Bob', 'age': 25, 'city': 'New York'}
+\`\`\`
+
+## Accessing Dictionary Elements
+
+**Example: Different Ways to Access Values**
+
+\`\`\`python
+student = {"name": "Alice", "age": 20, "grade": "A"}
+
+# Using square brackets
+print(student["name"])  # Alice
+
+# Using get() method (safer)
+print(student.get("age"))  # 20
+print(student.get("email", "Not found"))  # Not found
+\`\`\`
+
+**Output:**
+\`\`\`
+Alice
+20
+Not found
+\`\`\`
 
 ## Dictionary Methods
-- keys() - Get all keys
-- values() - Get all values  
-- items() - Get key-value pairs
-- get() - Access values safely
-- update() - Update multiple items
-- pop() - Remove specific key
 
-## Use Cases
-- Storing structured data
-- Counting occurrences
-- Fast lookups by key
-- Configuration settings`
+| Method | Description | Example |
+|--------|-------------|---------|
+| keys() | Returns all keys | dict.keys() |
+| values() | Returns all values | dict.values() |
+| items() | Returns key-value pairs | dict.items() |
+| get(key) | Returns value for key | dict.get("name") |
+| update() | Updates dictionary | dict.update({"age": 21}) |
+| pop(key) | Removes and returns value | dict.pop("age") |
+| clear() | Removes all items | dict.clear() |
+| copy() | Returns shallow copy | dict.copy() |
+
+**Example: Using Dictionary Methods**
+
+\`\`\`python
+student = {"name": "Alice", "age": 20, "grade": "A"}
+
+# Get all keys
+print("Keys:", list(student.keys()))
+
+# Get all values
+print("Values:", list(student.values()))
+
+# Get all items
+print("Items:", list(student.items()))
+
+# Update dictionary
+student.update({"age": 21, "email": "alice@example.com"})
+print("Updated:", student)
+\`\`\`
+
+**Output:**
+\`\`\`
+Keys: ['name', 'age', 'grade']
+Values: ['Alice', 20, 'A']
+Items: [('name', 'Alice'), ('age', 20), ('grade', 'A')]
+Updated: {'name': 'Alice', 'age': 21, 'grade': 'A', 'email': 'alice@example.com'}
+\`\`\`
+
+## Adding and Modifying Elements
+
+**Example: Adding and Updating**
+
+\`\`\`python
+student = {"name": "Alice", "age": 20}
+
+# Add new key-value pair
+student["grade"] = "A"
+student["courses"] = ["Python", "Math"]
+
+# Modify existing value
+student["age"] = 21
+
+print(student)
+\`\`\`
+
+**Output:**
+\`\`\`
+{'name': 'Alice', 'age': 21, 'grade': 'A', 'courses': ['Python', 'Math']}
+\`\`\`
+
+## Removing Elements
+
+**Example: Different Removal Methods**
+
+\`\`\`python
+student = {"name": "Alice", "age": 20, "grade": "A", "email": "alice@example.com"}
+
+# Remove specific key using pop()
+age = student.pop("age")
+print(f"Removed age: {age}")
+print("After pop:", student)
+
+# Remove specific key using del
+del student["email"]
+print("After del:", student)
+
+# Remove last inserted item using popitem()
+item = student.popitem()
+print(f"Removed item: {item}")
+print("Final:", student)
+\`\`\`
+
+**Output:**
+\`\`\`
+Removed age: 20
+After pop: {'name': 'Alice', 'grade': 'A', 'email': 'alice@example.com'}
+After del: {'name': 'Alice', 'grade': 'A'}
+Removed item: ('grade', 'A')
+Final: {'name': 'Alice'}
+\`\`\`
+
+## Looping Through Dictionaries
+
+**Example: Different Loop Patterns**
+
+\`\`\`python
+student = {"name": "Alice", "age": 20, "grade": "A"}
+
+# Loop through keys
+print("Keys:")
+for key in student:
+    print(key)
+
+# Loop through values
+print("\\nValues:")
+for value in student.values():
+    print(value)
+
+# Loop through key-value pairs
+print("\\nKey-Value Pairs:")
+for key, value in student.items():
+    print(f"{key}: {value}")
+\`\`\`
+
+**Output:**
+\`\`\`
+Keys:
+name
+age
+grade
+
+Values:
+Alice
+20
+A
+
+Key-Value Pairs:
+name: Alice
+age: 20
+grade: A
+\`\`\`
+
+## Dictionary Comprehension
+
+**Example: Creating Dictionaries with Comprehension**
+
+\`\`\`python
+# Square numbers
+squares = {x: x**2 for x in range(1, 6)}
+print("Squares:", squares)
+
+# Filter even numbers
+numbers = {1: 'one', 2: 'two', 3: 'three', 4: 'four'}
+even_nums = {k: v for k, v in numbers.items() if k % 2 == 0}
+print("Even numbers:", even_nums)
+\`\`\`
+
+**Output:**
+\`\`\`
+Squares: {1: 1, 2: 4, 3: 9, 4: 16, 5: 25}
+Even numbers: {2: 'two', 4: 'four'}
+\`\`\`
+
+## Nested Dictionaries
+
+**Example: Working with Nested Structures**
+
+\`\`\`python
+students = {
+    "student1": {"name": "Alice", "grade": "A"},
+    "student2": {"name": "Bob", "grade": "B"},
+    "student3": {"name": "Charlie", "grade": "A"}
+}
+
+# Access nested values
+print(students["student1"]["name"])
+
+# Loop through nested dictionary
+for student_id, info in students.items():
+    print(f"{student_id}: {info['name']} - Grade {info['grade']}")
+\`\`\`
+
+**Output:**
+\`\`\`
+Alice
+student1: Alice - Grade A
+student2: Bob - Grade B
+student3: Charlie - Grade A
+\`\`\`
+
+## Practical Use Cases
+
+### 1. Counting Word Frequency
+
+\`\`\`python
+text = "hello world hello python world"
+words = text.split()
+word_count = {}
+
+for word in words:
+    word_count[word] = word_count.get(word, 0) + 1
+
+print(word_count)
+\`\`\`
+
+**Output:**
+\`\`\`
+{'hello': 2, 'world': 2, 'python': 1}
+\`\`\`
+
+### 2. Grouping Data
+
+\`\`\`python
+students = [
+    {"name": "Alice", "grade": "A"},
+    {"name": "Bob", "grade": "B"},
+    {"name": "Charlie", "grade": "A"}
+]
+
+# Group by grade
+by_grade = {}
+for student in students:
+    grade = student["grade"]
+    if grade not in by_grade:
+        by_grade[grade] = []
+    by_grade[grade].append(student["name"])
+
+print(by_grade)
+\`\`\`
+
+**Output:**
+\`\`\`
+{'A': ['Alice', 'Charlie'], 'B': ['Bob']}
+\`\`\`
+
+## Key Points to Remember
+
+- Dictionaries are mutable and can be modified after creation
+- Keys must be unique and immutable (strings, numbers, tuples)
+- Values can be of any data type, including other dictionaries
+- Dictionaries are ordered as of Python 3.7+
+- Use get() method to avoid KeyError when accessing keys
+- Dictionary comprehensions provide a concise way to create dictionaries
+- Dictionaries offer O(1) average time complexity for lookups`
               },
               {
                 id: '1-5-a2',
@@ -3740,23 +4023,356 @@ Dictionaries use curly braces with key-value pairs.
                 completed: false,
                 content: `# Python Tuple
 
-Tuples are ordered and immutable collections.
+A tuple is an ordered, immutable collection of elements in Python. Once created, tuples cannot be modified, making them ideal for storing data that shouldn't change throughout the program.
 
-## Creating Tuples
-Use parentheses to create tuples. Single-item tuples need a trailing comma.
+## Understanding Tuples
+
+Tuples are similar to lists but with one key difference: **immutability**. This means you cannot add, remove, or modify elements after the tuple is created.
+
+### Creating Tuples
+
+**Example 1: Basic Tuple Creation**
+
+\`\`\`python
+# Empty tuple
+empty_tuple = ()
+print("Empty:", empty_tuple)
+
+# Tuple with values
+fruits = ("apple", "banana", "cherry")
+print("Fruits:", fruits)
+
+# Tuple with mixed data types
+mixed = (1, "hello", 3.14, True)
+print("Mixed:", mixed)
+
+# Single item tuple (note the comma!)
+single = ("apple",)
+print("Single:", single)
+print("Type:", type(single))
+
+# Without comma, it's not a tuple
+not_tuple = ("apple")
+print("Not tuple:", type(not_tuple))
+\`\`\`
+
+**Output:**
+\`\`\`
+Empty: ()
+Fruits: ('apple', 'banana', 'cherry')
+Mixed: (1, 'hello', 3.14, True)
+Single: ('apple',)
+Type: <class 'tuple'>
+Not tuple: <class 'str'>
+\`\`\`
+
+**Example 2: Creating Tuples Without Parentheses**
+
+\`\`\`python
+# Tuple packing (parentheses optional)
+coordinates = 10, 20, 30
+print("Coordinates:", coordinates)
+print("Type:", type(coordinates))
+
+# Using tuple() constructor
+numbers = tuple([1, 2, 3, 4, 5])
+print("Numbers:", numbers)
+
+# From string
+letters = tuple("hello")
+print("Letters:", letters)
+\`\`\`
+
+**Output:**
+\`\`\`
+Coordinates: (10, 20, 30)
+Type: <class 'tuple'>
+Numbers: (1, 2, 3, 4, 5)
+Letters: ('h', 'e', 'l', 'l', 'o')
+\`\`\`
+
+## Accessing Tuple Elements
+
+**Example: Indexing and Slicing**
+
+\`\`\`python
+fruits = ("apple", "banana", "cherry", "date", "elderberry")
+
+# Positive indexing
+print("First:", fruits[0])
+print("Third:", fruits[2])
+
+# Negative indexing
+print("Last:", fruits[-1])
+print("Second last:", fruits[-2])
+
+# Slicing
+print("First three:", fruits[0:3])
+print("From index 2:", fruits[2:])
+print("Last two:", fruits[-2:])
+print("Every second:", fruits[::2])
+\`\`\`
+
+**Output:**
+\`\`\`
+First: apple
+Third: cherry
+Last: elderberry
+Second last: date
+First three: ('apple', 'banana', 'cherry')
+From index 2: ('cherry', 'date', 'elderberry')
+Last two: ('date', 'elderberry')
+Every second: ('apple', 'cherry', 'elderberry')
+\`\`\`
 
 ## Tuple Methods
-- count() - Count occurrences
-- index() - Find position
+
+Tuples have only two built-in methods due to their immutable nature:
+
+| Method | Description | Example |
+|--------|-------------|---------|
+| count() | Returns count of specified value | tuple.count(value) |
+| index() | Returns index of first occurrence | tuple.index(value) |
+
+**Example: Using Tuple Methods**
+
+\`\`\`python
+numbers = (1, 2, 3, 2, 4, 2, 5)
+
+# Count occurrences
+count_2 = numbers.count(2)
+print(f"Number 2 appears {count_2} times")
+
+# Find index
+index_3 = numbers.index(3)
+print(f"Number 3 is at index {index_3}")
+
+# Find index with start position
+index_2_after_3 = numbers.index(2, 3)
+print(f"Next 2 after index 3 is at: {index_2_after_3}")
+
+# Length of tuple
+print(f"Length: {len(numbers)}")
+
+# Check membership
+print(f"Is 4 in tuple? {4 in numbers}")
+print(f"Is 10 in tuple? {10 in numbers}")
+\`\`\`
+
+**Output:**
+\`\`\`
+Number 2 appears 3 times
+Number 3 is at index 2
+Next 2 after index 3 is at: 3
+Length: 7
+Is 4 in tuple? True
+Is 10 in tuple? False
+\`\`\`
 
 ## Tuple Unpacking
-Extract values into variables easily.
 
-## Why Use Tuples?
-- Immutable (data protection)
-- Faster than lists
-- Can be dictionary keys
-- Return multiple values from functions`
+One of the most powerful features of tuples is unpacking - assigning tuple elements to multiple variables.
+
+**Example: Basic Unpacking**
+
+\`\`\`python
+# Basic unpacking
+coordinates = (10, 20, 30)
+x, y, z = coordinates
+print(f"x={x}, y={y}, z={z}")
+
+# Swapping variables
+a, b = 5, 10
+print(f"Before swap: a={a}, b={b}")
+a, b = b, a
+print(f"After swap: a={a}, b={b}")
+
+# Unpacking with underscore (ignore values)
+person = ("Alice", 25, "Engineer", "New York")
+name, age, _, city = person
+print(f"{name}, {age} years old, lives in {city}")
+\`\`\`
+
+**Output:**
+\`\`\`
+x=10, y=20, z=30
+Before swap: a=5, b=10
+After swap: a=10, b=5
+Alice, 25 years old, lives in New York
+\`\`\`
+
+**Example: Extended Unpacking with Asterisk**
+
+\`\`\`python
+# Unpack first, rest, and last
+numbers = (1, 2, 3, 4, 5, 6, 7)
+first, *middle, last = numbers
+print(f"First: {first}")
+print(f"Middle: {middle}")
+print(f"Last: {last}")
+
+# Unpack first two and rest
+a, b, *rest = numbers
+print(f"a={a}, b={b}, rest={rest}")
+
+# Unpack first and rest
+head, *tail = numbers
+print(f"Head: {head}, Tail: {tail}")
+\`\`\`
+
+**Output:**
+\`\`\`
+First: 1
+Middle: [2, 3, 4, 5, 6]
+Last: 7
+a=1, b=2, rest=[3, 4, 5, 6, 7]
+Head: 1, Tail: [2, 3, 4, 5, 6, 7]
+\`\`\`
+
+## Tuple Operations
+
+**Example: Concatenation and Repetition**
+
+\`\`\`python
+# Concatenation
+tuple1 = (1, 2, 3)
+tuple2 = (4, 5, 6)
+combined = tuple1 + tuple2
+print("Combined:", combined)
+
+# Repetition
+repeated = tuple1 * 3
+print("Repeated:", repeated)
+
+# Comparison
+print("tuple1 < tuple2:", tuple1 < tuple2)
+print("(1, 2) == (1, 2):", (1, 2) == (1, 2))
+\`\`\`
+
+**Output:**
+\`\`\`
+Combined: (1, 2, 3, 4, 5, 6)
+Repeated: (1, 2, 3, 1, 2, 3, 1, 2, 3)
+tuple1 < tuple2: True
+(1, 2) == (1, 2): True
+\`\`\`
+
+## Nested Tuples
+
+**Example: Working with Nested Tuples**
+
+\`\`\`python
+# Nested tuple
+matrix = (
+    (1, 2, 3),
+    (4, 5, 6),
+    (7, 8, 9)
+)
+
+# Access nested elements
+print("First row:", matrix[0])
+print("Element at [1][2]:", matrix[1][2])
+
+# Loop through nested tuple
+print("\\nMatrix elements:")
+for row in matrix:
+    for element in row:
+        print(element, end=" ")
+    print()
+\`\`\`
+
+**Output:**
+\`\`\`
+First row: (1, 2, 3)
+Element at [1][2]: 6
+
+Matrix elements:
+1 2 3 
+4 5 6 
+7 8 9 
+\`\`\`
+
+## Tuples vs Lists
+
+| Feature | Tuple | List |
+|---------|-------|------|
+| Mutability | Immutable | Mutable |
+| Syntax | () | [] |
+| Performance | Faster | Slower |
+| Methods | 2 (count, index) | Many |
+| Use Case | Fixed data | Dynamic data |
+| Memory | Less | More |
+
+## Practical Use Cases
+
+### 1. Returning Multiple Values from Functions
+
+\`\`\`python
+def get_student_info():
+    name = "Alice"
+    age = 20
+    grade = "A"
+    return name, age, grade  # Returns a tuple
+
+# Unpack returned values
+student_name, student_age, student_grade = get_student_info()
+print(f"{student_name}, {student_age} years, Grade: {student_grade}")
+\`\`\`
+
+**Output:**
+\`\`\`
+Alice, 20 years, Grade: A
+\`\`\`
+
+### 2. Dictionary Keys
+
+\`\`\`python
+# Tuples can be dictionary keys (lists cannot)
+locations = {
+    (40.7128, -74.0060): "New York",
+    (51.5074, -0.1278): "London",
+    (35.6762, 139.6503): "Tokyo"
+}
+
+# Access by coordinate tuple
+ny_coords = (40.7128, -74.0060)
+print(f"City at {ny_coords}: {locations[ny_coords]}")
+\`\`\`
+
+**Output:**
+\`\`\`
+City at (40.7128, -74.006): New York
+\`\`\`
+
+### 3. Data Integrity
+
+\`\`\`python
+# Configuration that shouldn't change
+DATABASE_CONFIG = ("localhost", 5432, "mydb", "user")
+host, port, database, user = DATABASE_CONFIG
+
+print(f"Connecting to {database} at {host}:{port} as {user}")
+
+# Trying to modify will raise an error
+# DATABASE_CONFIG[0] = "newhost"  # TypeError!
+\`\`\`
+
+**Output:**
+\`\`\`
+Connecting to mydb at localhost:5432 as user
+\`\`\`
+
+## Key Points to Remember
+
+- Tuples are immutable - cannot be modified after creation
+- Use parentheses () or just commas to create tuples
+- Single-item tuples require a trailing comma: (item,)
+- Tuples are faster and use less memory than lists
+- Perfect for fixed collections of items
+- Can be used as dictionary keys (unlike lists)
+- Support indexing, slicing, and iteration
+- Great for returning multiple values from functions
+- Tuple unpacking is a powerful feature for clean code`
               },
               {
                 id: '1-5-a3',
@@ -3764,24 +4380,425 @@ Extract values into variables easily.
                 completed: false,
                 content: `# Python Sets
 
-Sets are unordered collections with no duplicates.
+A set is an unordered collection of unique elements in Python. Sets are mutable, but they can only contain immutable (hashable) elements. They are perfect for membership testing, removing duplicates, and mathematical set operations.
+
+## Understanding Sets
+
+Sets automatically remove duplicate values and do not maintain any specific order. They are defined using curly braces {} or the set() constructor.
+
+### Creating Sets
+
+**Example 1: Basic Set Creation**
+
+\`\`\`python
+# Empty set (must use set(), not {})
+empty_set = set()
+print("Empty set:", empty_set)
+print("Type:", type(empty_set))
+
+# Set with values
+fruits = {"apple", "banana", "cherry"}
+print("Fruits:", fruits)
+
+# Set automatically removes duplicates
+numbers = {1, 2, 3, 2, 4, 3, 5}
+print("Numbers:", numbers)
+
+# Note: {} creates an empty dictionary, not a set!
+empty_dict = {}
+print("Empty dict type:", type(empty_dict))
+\`\`\`
+
+**Output:**
+\`\`\`
+Empty set: set()
+Type: <class 'set'>
+Fruits: {'cherry', 'banana', 'apple'}
+Numbers: {1, 2, 3, 4, 5}
+Empty dict type: <class 'dict'>
+\`\`\`
+
+**Example 2: Creating Sets from Other Sequences**
+
+\`\`\`python
+# From list (removes duplicates)
+list_with_dupes = [1, 2, 2, 3, 4, 4, 5]
+unique_numbers = set(list_with_dupes)
+print("From list:", unique_numbers)
+
+# From string (each character becomes an element)
+letters = set("hello")
+print("From string:", letters)
+
+# From tuple
+tuple_set = set((1, 2, 3, 4))
+print("From tuple:", tuple_set)
+
+# Using set comprehension
+squares = {x**2 for x in range(1, 6)}
+print("Squares:", squares)
+\`\`\`
+
+**Output:**
+\`\`\`
+From list: {1, 2, 3, 4, 5}
+From string: {'h', 'e', 'l', 'o'}
+From tuple: {1, 2, 3, 4}
+Squares: {1, 4, 9, 16, 25}
+\`\`\`
+
+## Adding and Removing Elements
+
+**Example: Modifying Sets**
+
+\`\`\`python
+fruits = {"apple", "banana"}
+
+# Add single element
+fruits.add("cherry")
+print("After add:", fruits)
+
+# Add multiple elements
+fruits.update(["date", "elderberry", "fig"])
+print("After update:", fruits)
+
+# Remove element (raises error if not found)
+fruits.remove("banana")
+print("After remove:", fruits)
+
+# Discard element (no error if not found)
+fruits.discard("grape")  # grape doesn't exist, no error
+print("After discard:", fruits)
+
+# Remove and return arbitrary element
+removed = fruits.pop()
+print(f"Popped: {removed}")
+print("After pop:", fruits)
+
+# Clear all elements
+fruits.clear()
+print("After clear:", fruits)
+\`\`\`
+
+**Output:**
+\`\`\`
+After add: {'cherry', 'banana', 'apple'}
+After update: {'cherry', 'banana', 'apple', 'date', 'elderberry', 'fig'}
+After remove: {'cherry', 'apple', 'date', 'elderberry', 'fig'}
+After discard: {'cherry', 'apple', 'date', 'elderberry', 'fig'}
+Popped: cherry
+After pop: {'apple', 'date', 'elderberry', 'fig'}
+After clear: set()
+\`\`\`
 
 ## Set Operations
-- Union (|) - Combine all elements
-- Intersection (&) - Common elements
-- Difference (-) - Elements in first but not second
-- Symmetric Difference (^) - Elements in either but not both
 
-## Set Methods
-- add() - Add single item
-- update() - Add multiple items
-- remove() - Remove item (error if not found)
-- discard() - Remove item (no error)
+Sets support mathematical set operations like union, intersection, difference, and symmetric difference.
 
-## Use Cases
-- Remove duplicates from lists
-- Fast membership testing
-- Mathematical set operations`
+### Union - Combining Sets
+
+**Example: Union Operations**
+
+\`\`\`python
+set1 = {1, 2, 3, 4}
+set2 = {3, 4, 5, 6}
+
+# Using | operator
+union1 = set1 | set2
+print("Union (|):", union1)
+
+# Using union() method
+union2 = set1.union(set2)
+print("Union method:", union2)
+
+# Union of multiple sets
+set3 = {5, 6, 7, 8}
+union3 = set1 | set2 | set3
+print("Multiple union:", union3)
+\`\`\`
+
+**Output:**
+\`\`\`
+Union (|): {1, 2, 3, 4, 5, 6}
+Union method: {1, 2, 3, 4, 5, 6}
+Multiple union: {1, 2, 3, 4, 5, 6, 7, 8}
+\`\`\`
+
+### Intersection - Common Elements
+
+**Example: Intersection Operations**
+
+\`\`\`python
+set1 = {1, 2, 3, 4, 5}
+set2 = {3, 4, 5, 6, 7}
+
+# Using & operator
+intersection1 = set1 & set2
+print("Intersection (&):", intersection1)
+
+# Using intersection() method
+intersection2 = set1.intersection(set2)
+print("Intersection method:", intersection2)
+
+# Intersection of multiple sets
+set3 = {4, 5, 6, 7, 8}
+intersection3 = set1 & set2 & set3
+print("Multiple intersection:", intersection3)
+\`\`\`
+
+**Output:**
+\`\`\`
+Intersection (&): {3, 4, 5}
+Intersection method: {3, 4, 5}
+Multiple intersection: {4, 5}
+\`\`\`
+
+### Difference - Elements in First but Not Second
+
+**Example: Difference Operations**
+
+\`\`\`python
+set1 = {1, 2, 3, 4, 5}
+set2 = {3, 4, 5, 6, 7}
+
+# Using - operator
+diff1 = set1 - set2
+print("set1 - set2:", diff1)
+
+diff2 = set2 - set1
+print("set2 - set1:", diff2)
+
+# Using difference() method
+diff3 = set1.difference(set2)
+print("Difference method:", diff3)
+\`\`\`
+
+**Output:**
+\`\`\`
+set1 - set2: {1, 2}
+set2 - set1: {6, 7}
+Difference method: {1, 2}
+\`\`\`
+
+### Symmetric Difference - Elements in Either but Not Both
+
+**Example: Symmetric Difference**
+
+\`\`\`python
+set1 = {1, 2, 3, 4}
+set2 = {3, 4, 5, 6}
+
+# Using ^ operator
+sym_diff1 = set1 ^ set2
+print("Symmetric difference (^):", sym_diff1)
+
+# Using symmetric_difference() method
+sym_diff2 = set1.symmetric_difference(set2)
+print("Symmetric difference method:", sym_diff2)
+\`\`\`
+
+**Output:**
+\`\`\`
+Symmetric difference (^): {1, 2, 5, 6}
+Symmetric difference method: {1, 2, 5, 6}
+\`\`\`
+
+## Set Methods Summary
+
+| Method | Description | Example |
+|--------|-------------|---------|
+| add() | Add single element | set.add(item) |
+| update() | Add multiple elements | set.update([1, 2, 3]) |
+| remove() | Remove element (error if not found) | set.remove(item) |
+| discard() | Remove element (no error) | set.discard(item) |
+| pop() | Remove and return arbitrary element | set.pop() |
+| clear() | Remove all elements | set.clear() |
+| union() | Return union of sets | set1.union(set2) |
+| intersection() | Return common elements | set1.intersection(set2) |
+| difference() | Return difference | set1.difference(set2) |
+| symmetric_difference() | Return symmetric difference | set1.symmetric_difference(set2) |
+| issubset() | Check if subset | set1.issubset(set2) |
+| issuperset() | Check if superset | set1.issuperset(set2) |
+| isdisjoint() | Check if no common elements | set1.isdisjoint(set2) |
+
+## Set Relationships
+
+**Example: Checking Set Relationships**
+
+\`\`\`python
+set1 = {1, 2, 3}
+set2 = {1, 2, 3, 4, 5}
+set3 = {6, 7, 8}
+
+# Subset check
+print("set1 is subset of set2:", set1.issubset(set2))
+print("Using <=:", set1 <= set2)
+
+# Superset check
+print("set2 is superset of set1:", set2.issuperset(set1))
+print("Using >=:", set2 >= set1)
+
+# Disjoint check (no common elements)
+print("set1 and set3 are disjoint:", set1.isdisjoint(set3))
+print("set1 and set2 are disjoint:", set1.isdisjoint(set2))
+\`\`\`
+
+**Output:**
+\`\`\`
+set1 is subset of set2: True
+Using <=: True
+set2 is superset of set1: True
+Using >=: True
+set1 and set3 are disjoint: True
+set1 and set2 are disjoint: False
+\`\`\`
+
+## Set Comprehension
+
+**Example: Creating Sets with Comprehension**
+
+\`\`\`python
+# Square numbers
+squares = {x**2 for x in range(1, 6)}
+print("Squares:", squares)
+
+# Even numbers
+evens = {x for x in range(1, 11) if x % 2 == 0}
+print("Evens:", evens)
+
+# First letter of each word
+words = ["apple", "banana", "apricot", "blueberry"]
+first_letters = {word[0] for word in words}
+print("First letters:", first_letters)
+\`\`\`
+
+**Output:**
+\`\`\`
+Squares: {1, 4, 9, 16, 25}
+Evens: {2, 4, 6, 8, 10}
+First letters: {'a', 'b'}
+\`\`\`
+
+## Frozen Sets
+
+Frozen sets are immutable versions of sets that can be used as dictionary keys or elements of other sets.
+
+**Example: Using Frozen Sets**
+
+\`\`\`python
+# Create frozen set
+frozen = frozenset([1, 2, 3, 4])
+print("Frozen set:", frozen)
+
+# Can be used as dictionary key
+locations = {
+    frozenset(["New York", "USA"]): "Eastern",
+    frozenset(["London", "UK"]): "GMT"
+}
+print("Locations:", locations)
+
+# Cannot be modified
+# frozen.add(5)  # AttributeError!
+\`\`\`
+
+**Output:**
+\`\`\`
+Frozen set: frozenset({1, 2, 3, 4})
+Locations: {frozenset({'USA', 'New York'}): 'Eastern', frozenset({'UK', 'London'}): 'GMT'}
+\`\`\`
+
+## Practical Use Cases
+
+### 1. Removing Duplicates
+
+**Example: Remove Duplicates from List**
+
+\`\`\`python
+numbers = [1, 2, 2, 3, 4, 4, 5, 5, 5]
+unique = list(set(numbers))
+print("Original:", numbers)
+print("Unique:", sorted(unique))
+
+# Preserve order using dict
+unique_ordered = list(dict.fromkeys(numbers))
+print("Unique (ordered):", unique_ordered)
+\`\`\`
+
+**Output:**
+\`\`\`
+Original: [1, 2, 2, 3, 4, 4, 5, 5, 5]
+Unique: [1, 2, 3, 4, 5]
+Unique (ordered): [1, 2, 3, 4, 5]
+\`\`\`
+
+### 2. Fast Membership Testing
+
+**Example: Performance Comparison**
+
+\`\`\`python
+# Sets are much faster for membership testing
+large_list = list(range(10000))
+large_set = set(range(10000))
+
+# Check if 9999 exists
+# In list: O(n) time
+# In set: O(1) time
+
+print("9999 in list:", 9999 in large_list)
+print("9999 in set:", 9999 in large_set)
+\`\`\`
+
+**Output:**
+\`\`\`
+9999 in list: True
+9999 in set: True
+\`\`\`
+
+### 3. Finding Common Elements
+
+**Example: Common Interests**
+
+\`\`\`python
+alice_interests = {"Python", "Data Science", "AI", "Music"}
+bob_interests = {"Python", "Web Dev", "AI", "Gaming"}
+
+# Common interests
+common = alice_interests & bob_interests
+print("Common interests:", common)
+
+# Unique to Alice
+alice_only = alice_interests - bob_interests
+print("Alice only:", alice_only)
+
+# Unique to Bob
+bob_only = bob_interests - alice_interests
+print("Bob only:", bob_only)
+
+# All interests
+all_interests = alice_interests | bob_interests
+print("All interests:", all_interests)
+\`\`\`
+
+**Output:**
+\`\`\`
+Common interests: {'AI', 'Python'}
+Alice only: {'Music', 'Data Science'}
+Bob only: {'Gaming', 'Web Dev'}
+All interests: {'AI', 'Python', 'Music', 'Data Science', 'Gaming', 'Web Dev'}
+\`\`\`
+
+## Key Points to Remember
+
+- Sets are unordered collections of unique elements
+- Sets automatically remove duplicates
+- Use set() to create an empty set, not {}
+- Sets can only contain immutable (hashable) elements
+- Sets are mutable, but frozensets are immutable
+- Set operations are very efficient (O(1) for membership testing)
+- Perfect for mathematical set operations
+- Cannot access elements by index (unordered)
+- Set comprehensions provide concise set creation
+- Use sets when order doesn't matter and uniqueness is important`
               }
             ],
             problems: [
