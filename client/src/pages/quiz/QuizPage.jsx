@@ -354,21 +354,27 @@ const QuizPage = () => {
   const [quiz, setQuiz] = useState(null);
 
   useEffect(() => {
-    // Check if quiz data is passed via location state (from course page)
-    if (location.state && location.state.quiz) {
-      console.log('Using quiz data from location.state:', location.state.quiz);
-      setQuiz(location.state.quiz);
-    } else {
-      // Fallback to local quizzesData
-      const quizData = quizzesData[quizId];
-      console.log('Quiz data from quizzesData:', quizData);
+    // Prioritize local quizzesData if it exists (has full question details)
+    const localQuizData = quizzesData[quizId];
+    
+    if (localQuizData) {
+      console.log('Using quiz data from local quizzesData:', localQuizData);
+      setQuiz(localQuizData);
+    } else if (location.state && location.state.quiz) {
+      // Use data from location state if local data doesn't exist
+      const stateQuiz = location.state.quiz;
+      console.log('Using quiz data from location.state:', stateQuiz);
       
-      if (quizData) {
-        setQuiz(quizData);
+      // Check if the quiz has proper questions array
+      if (stateQuiz.questions && Array.isArray(stateQuiz.questions) && stateQuiz.questions.length > 0) {
+        setQuiz(stateQuiz);
       } else {
-        console.log('Quiz not found, redirecting...');
+        console.error('Quiz data is incomplete (no questions array)');
         navigate('/courses');
       }
+    } else {
+      console.log('Quiz not found, redirecting...');
+      navigate('/courses');
     }
   }, [quizId, navigate, location.state]);
 

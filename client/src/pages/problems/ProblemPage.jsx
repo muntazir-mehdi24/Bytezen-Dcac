@@ -675,22 +675,27 @@ const ProblemPage = () => {
   const [problem, setProblem] = useState(null);
 
   useEffect(() => {
-    // Check if problem data is passed via location state (from course page)
-    if (location.state && location.state.problem) {
-      console.log('Using problem data from location.state:', location.state.problem);
-      setProblem(location.state.problem);
-    } else {
-      // Fallback to local problemsData
-      const problemData = problemsData[problemId];
-      console.log('Problem data from problemsData:', problemData);
+    // Prioritize local problemsData if it exists (has full problem details)
+    const localProblemData = problemsData[problemId];
+    
+    if (localProblemData) {
+      console.log('Using problem data from local problemsData:', localProblemData);
+      setProblem(localProblemData);
+    } else if (location.state && location.state.problem) {
+      // Use data from location state if local data doesn't exist
+      const stateProblem = location.state.problem;
+      console.log('Using problem data from location.state:', stateProblem);
       
-      if (problemData) {
-        setProblem(problemData);
+      // Check if the problem has necessary fields
+      if (stateProblem.description && stateProblem.starterCode) {
+        setProblem(stateProblem);
       } else {
-        console.log('Problem not found, redirecting...');
-        // Redirect to courses if not found
+        console.error('Problem data is incomplete');
         navigate('/courses');
       }
+    } else {
+      console.log('Problem not found, redirecting...');
+      navigate('/courses');
     }
   }, [problemId, navigate, location.state]);
 
