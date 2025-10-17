@@ -3701,6 +3701,254 @@ print(flatten_list([['a'], ['b', 'c'], ['d']]))  # Should output ['a', 'b', 'c',
                 ]
               }
             ]
+          },
+          {
+            id: '1-5',
+            title: 'Day 5: Dictionaries, Tuples and Sets',
+            duration: '3 Articles • 5 Problems • 10 MCQs',
+            type: 'day',
+            completed: false,
+            articles: [
+              {
+                id: '1-5-a1',
+                title: 'Python Dictionary',
+                completed: false,
+                content: `# Python Dictionary
+
+Dictionaries store data in key:value pairs. They are ordered (Python 3.7+), changeable, and don't allow duplicate keys.
+
+## Creating Dictionaries
+Dictionaries use curly braces with key-value pairs.
+
+## Dictionary Methods
+- keys() - Get all keys
+- values() - Get all values  
+- items() - Get key-value pairs
+- get() - Access values safely
+- update() - Update multiple items
+- pop() - Remove specific key
+
+## Use Cases
+- Storing structured data
+- Counting occurrences
+- Fast lookups by key
+- Configuration settings`
+              },
+              {
+                id: '1-5-a2',
+                title: 'Python Tuple',
+                completed: false,
+                content: `# Python Tuple
+
+Tuples are ordered and immutable collections.
+
+## Creating Tuples
+Use parentheses to create tuples. Single-item tuples need a trailing comma.
+
+## Tuple Methods
+- count() - Count occurrences
+- index() - Find position
+
+## Tuple Unpacking
+Extract values into variables easily.
+
+## Why Use Tuples?
+- Immutable (data protection)
+- Faster than lists
+- Can be dictionary keys
+- Return multiple values from functions`
+              },
+              {
+                id: '1-5-a3',
+                title: 'Python Sets',
+                completed: false,
+                content: `# Python Sets
+
+Sets are unordered collections with no duplicates.
+
+## Set Operations
+- Union (|) - Combine all elements
+- Intersection (&) - Common elements
+- Difference (-) - Elements in first but not second
+- Symmetric Difference (^) - Elements in either but not both
+
+## Set Methods
+- add() - Add single item
+- update() - Add multiple items
+- remove() - Remove item (error if not found)
+- discard() - Remove item (no error)
+
+## Use Cases
+- Remove duplicates from lists
+- Fast membership testing
+- Mathematical set operations`
+              }
+            ],
+            problems: [
+              {
+                id: '1-5-p1',
+                title: 'Dictionary Operations',
+                difficulty: 'Easy',
+                points: 3,
+                description: 'Create and manipulate a student dictionary.',
+                starterCode: `student = {"name": "Alice", "age": 20, "subjects": ["Math"]}
+# Add Chemistry to subjects
+# Update grade to A+
+print(student)`,
+                solution: `student = {"name": "Alice", "age": 20, "subjects": ["Math"]}
+student["subjects"].append("Chemistry")
+student["grade"] = "A+"
+print(student)`,
+                testCases: [{ input: '', expectedOutput: 'Dictionary updated' }]
+              },
+              {
+                id: '1-5-p2',
+                title: 'Word Frequency Counter',
+                difficulty: 'Medium',
+                points: 4,
+                description: 'Count word frequency using dictionary.',
+                starterCode: `def count_words(sentence):
+    words = sentence.lower().split()
+    # Your code here
+    return word_count
+
+print(count_words("hello world hello"))`,
+                solution: `def count_words(sentence):
+    words = sentence.lower().split()
+    word_count = {}
+    for word in words:
+        word_count[word] = word_count.get(word, 0) + 1
+    return word_count
+
+print(count_words("hello world hello"))`,
+                testCases: [{ input: 'hello world hello', expectedOutput: "{'hello': 2, 'world': 1}" }]
+              },
+              {
+                id: '1-5-p3',
+                title: 'Tuple Unpacking',
+                difficulty: 'Easy',
+                points: 2,
+                description: 'Practice tuple unpacking.',
+                starterCode: `coordinates = (10, 20, 30)
+# Unpack into x, y, z
+print(f"x={x}, y={y}, z={z}")`,
+                solution: `coordinates = (10, 20, 30)
+x, y, z = coordinates
+print(f"x={x}, y={y}, z={z}")`,
+                testCases: [{ input: '', expectedOutput: 'x=10, y=20, z=30' }]
+              },
+              {
+                id: '1-5-p4',
+                title: 'Set Operations',
+                difficulty: 'Medium',
+                points: 4,
+                description: 'Find common and unique elements.',
+                starterCode: `set1 = {1, 2, 3, 4, 5}
+set2 = {4, 5, 6, 7, 8}
+# Find common elements
+print(f"Common: {common}")`,
+                solution: `set1 = {1, 2, 3, 4, 5}
+set2 = {4, 5, 6, 7, 8}
+common = set1 & set2
+print(f"Common: {common}")`,
+                testCases: [{ input: '', expectedOutput: 'Common: {4, 5}' }]
+              },
+              {
+                id: '1-5-p5',
+                title: 'Remove Duplicates',
+                difficulty: 'Easy',
+                points: 3,
+                description: 'Remove duplicates using sets.',
+                starterCode: `def remove_duplicates(numbers):
+    # Your code here
+    return result
+
+print(remove_duplicates([5, 2, 8, 2, 9, 5, 1]))`,
+                solution: `def remove_duplicates(numbers):
+    return sorted(list(set(numbers)))
+
+print(remove_duplicates([5, 2, 8, 2, 9, 5, 1]))`,
+                testCases: [{ input: '[5, 2, 8, 2, 9, 5, 1]', expectedOutput: '[1, 2, 5, 8, 9]' }]
+              }
+            ],
+            quiz: [
+              {
+                id: '1-5-quiz',
+                title: 'Day 5: Dictionaries, Tuples and Sets Quiz',
+                questions: [
+                  {
+                    id: 'q1',
+                    question: 'How do you create a dictionary?',
+                    options: ['dict = []', 'dict = ()', 'dict = {}', 'dict = ""'],
+                    correctAnswer: 2,
+                    explanation: 'Dictionaries use curly braces {} with key-value pairs.'
+                  },
+                  {
+                    id: 'q2',
+                    question: 'What is len({1, 2, 2, 3, 4, 4, 5})?',
+                    options: ['7', '5', '6', 'Error'],
+                    correctAnswer: 1,
+                    explanation: 'Sets remove duplicates, leaving 5 unique elements.'
+                  },
+                  {
+                    id: 'q3',
+                    question: 'Are tuples mutable?',
+                    options: ['Yes', 'No', 'Sometimes', 'Only with lists'],
+                    correctAnswer: 1,
+                    explanation: 'Tuples are immutable - cannot be changed after creation.'
+                  },
+                  {
+                    id: 'q4',
+                    question: 'Which method adds an item to a set?',
+                    options: ['append()', 'add()', 'insert()', 'push()'],
+                    correctAnswer: 1,
+                    explanation: 'Sets use add() method to add items.'
+                  },
+                  {
+                    id: 'q5',
+                    question: 'What does dict.get("key") return if key does not exist?',
+                    options: ['Error', 'None', '0', 'False'],
+                    correctAnswer: 1,
+                    explanation: 'get() returns None by default if key is not found.'
+                  },
+                  {
+                    id: 'q6',
+                    question: 'What is {1,2,3} & {2,3,4}?',
+                    options: ['{1,2,3,4}', '{2,3}', '{1,4}', 'Error'],
+                    correctAnswer: 1,
+                    explanation: '& is intersection operator, returns common elements.'
+                  },
+                  {
+                    id: 'q7',
+                    question: 'Can tuples be used as dictionary keys?',
+                    options: ['Yes', 'No', 'Only if empty', 'Only with numbers'],
+                    correctAnswer: 0,
+                    explanation: 'Tuples are immutable and hashable, so they can be keys.'
+                  },
+                  {
+                    id: 'q8',
+                    question: 'What does dict.keys() return?',
+                    options: ['List of keys', 'Tuple of keys', 'dict_keys object', 'Set of keys'],
+                    correctAnswer: 2,
+                    explanation: 'dict.keys() returns a dict_keys view object.'
+                  },
+                  {
+                    id: 'q9',
+                    question: 'What is {1,2,3} | {3,4,5}?',
+                    options: ['{3}', '{1,2,3,4,5}', '{1,2,4,5}', 'Error'],
+                    correctAnswer: 1,
+                    explanation: '| is union operator, combines all unique elements.'
+                  },
+                  {
+                    id: 'q10',
+                    question: 'How to create a single-item tuple?',
+                    options: ['(1)', '(1,)', '[1]', '{1}'],
+                    correctAnswer: 1,
+                    explanation: 'Single-item tuple needs trailing comma: (1,)'
+                  }
+                ]
+              }
+            ]
           }
         ]
       }
