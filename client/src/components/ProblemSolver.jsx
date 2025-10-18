@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import Editor from '@monaco-editor/react';
 import { FaPlay, FaCheckCircle, FaClock, FaLightbulb, FaTimes } from 'react-icons/fa';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import { codeAPI } from '../services/api';
 
 const ProblemSolver = ({ problem, onSubmit }) => {
@@ -237,7 +239,48 @@ const ProblemSolver = ({ problem, onSubmit }) => {
 
           {/* Problem Description */}
           <div className="prose max-w-none">
-            {problem.description && <p className="text-gray-700 mb-6 whitespace-pre-wrap">{problem.description}</p>}
+            {problem.description && (
+              <ReactMarkdown
+                remarkPlugins={[remarkGfm]}
+                className="text-gray-700 mb-6"
+                components={{
+                  h1: ({ node, ...props }) => <h1 className="text-2xl font-bold text-gray-900 mb-4 mt-6" {...props} />,
+                  h2: ({ node, ...props }) => <h2 className="text-xl font-bold text-gray-900 mb-3 mt-5" {...props} />,
+                  h3: ({ node, ...props }) => <h3 className="text-lg font-bold text-gray-900 mb-2 mt-4" {...props} />,
+                  h4: ({ node, ...props }) => <h4 className="text-base font-bold text-gray-900 mb-2 mt-3" {...props} />,
+                  p: ({ node, ...props }) => <p className="mb-3 leading-relaxed" {...props} />,
+                  strong: ({ node, ...props }) => <strong className="font-semibold text-gray-900" {...props} />,
+                  em: ({ node, ...props }) => <em className="italic" {...props} />,
+                  ul: ({ node, ...props }) => <ul className="list-disc list-inside mb-4 space-y-1" {...props} />,
+                  ol: ({ node, ...props }) => <ol className="list-decimal list-inside mb-4 space-y-1" {...props} />,
+                  li: ({ node, ...props }) => <li className="ml-4" {...props} />,
+                  code: ({ node, inline, ...props }) => 
+                    inline ? (
+                      <code className="bg-gray-100 px-1.5 py-0.5 rounded text-sm font-mono text-[#2f8d46]" {...props} />
+                    ) : (
+                      <code className="block bg-gray-900 text-gray-100 p-4 rounded-lg my-3 overflow-x-auto" {...props} />
+                    ),
+                  pre: ({ node, ...props }) => <pre className="bg-gray-900 text-gray-100 p-4 rounded-lg my-3 overflow-x-auto" {...props} />,
+                  blockquote: ({ node, ...props }) => <blockquote className="border-l-4 border-[#2f8d46] pl-4 italic my-4" {...props} />,
+                  table: ({ node, ...props }) => (
+                    <div className="overflow-x-auto my-4">
+                      <table className="min-w-full divide-y divide-gray-300 border border-gray-300" {...props} />
+                    </div>
+                  ),
+                  thead: ({ node, ...props }) => <thead className="bg-gray-50" {...props} />,
+                  tbody: ({ node, ...props }) => <tbody className="divide-y divide-gray-200 bg-white" {...props} />,
+                  tr: ({ node, ...props }) => <tr {...props} />,
+                  th: ({ node, ...props }) => (
+                    <th className="px-3 py-2 text-left text-sm font-semibold text-gray-900 border-r border-gray-300 last:border-r-0" {...props} />
+                  ),
+                  td: ({ node, ...props }) => (
+                    <td className="px-3 py-2 text-sm text-gray-700 border-r border-gray-200 last:border-r-0" {...props} />
+                  )
+                }}
+              >
+                {problem.description}
+              </ReactMarkdown>
+            )}
 
             {/* Tasks */}
             {problem.tasks && (
