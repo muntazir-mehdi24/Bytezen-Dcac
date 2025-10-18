@@ -1,0 +1,8 @@
+Day 5 content is too large for a single edit. I'll add it in parts to the CourseDetail.jsx file.
+
+The content includes:
+- 3 Articles: Python Dictionary, Python Tuple, Python Sets
+- 5 Problems with detailed examples
+- 10 MCQ quiz questions
+
+Due to token limits, I'll need to insert this content directly into the file using multiple smaller edits.
